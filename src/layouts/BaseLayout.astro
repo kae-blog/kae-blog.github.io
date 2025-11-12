@@ -1,1 +1,144 @@
+---
+// src/layouts/BaseLayout.astro
+// 這是你的主要「網站外殼」
+// 它包含了 <head>, <style>, <header>, <footer>
 
+import { ViewTransitions } from 'astro:transitions';
+
+// 從 astro.config.mjs 讀取網站標題 (雖然我們在這裡寫死了)
+const { siteTitle = "KAE的雜記 - 日本留學與生活" } = Astro.props;
+---
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{siteTitle}</title>
+    
+    <!-- 載入 Inter 與 Noto Sans TC 字體 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- 頁面轉場 (Astro 內建) -->
+    <ViewTransitions />
+
+    <!-- 這是從 kae_blog_template.html 複製過來的 <style> -->
+    <style is:global>
+        /* * KAE的雜記 - 靜態網站模板 CSS
+         * * - 這些變數現在是全域的
+         */
+        
+        body {
+            font-family: 'Inter', 'Noto Sans TC', sans-serif;
+            background-color: #e7f0e2; 
+            color: #333333;
+        }
+        
+        :root {
+            --bg-main: #e7f0e2;
+            --bg-card: #ffffff;
+            --text-primary: #333333;
+            --text-secondary: #555555;
+            --accent-color: #6a8b6a; 
+            --accent-hover: #587458; 
+            --border-color: #e5e5e5;
+        }
+        
+        /* 文章內容排版 (Prose) - Astro 會用 tailwind.config.mjs 的 @tailwindcss/typography 取代 */
+        /* 我們保留它以防萬一，但 .prose 樣式主要由 Tailwind 插件控制 */
+        .prose { color: var(--text-secondary); }
+        .prose h1, .prose h2, .prose h3 {
+            color: var(--text-primary);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+        }
+        .prose h1 { font-size: 2.25rem; margin-bottom: 1.5rem; }
+        .prose h2 { font-size: 1.875rem; margin-top: 2.5rem; margin-bottom: 1.25rem; }
+        .prose h3 { font-size: 1.5rem; margin-top: 2rem; margin-bottom: 1rem; }
+        .prose p, .prose li {
+            font-size: 1.125rem; /* 18px */
+            line-height: 1.8;
+            margin-top: 1.25rem;
+            margin-bottom: 1.25rem;
+        }
+        .prose strong { color: var(--text-primary); }
+        .prose a { color: var(--accent-color); text-decoration: none; }
+        .prose a:hover { text-decoration: underline; }
+        .prose img {
+            border-radius: 0.75rem; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            margin-top: 1.5rem;
+            margin-bottom: 1.5rem;
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            object-fit: cover;
+        }
+        .prose ul, .prose ol { padding-left: 1.75rem; }
+        .prose li { margin-top: 0.5rem; margin-bottom: 0.5rem; }
+        .prose blockquote {
+            border-left: 4px solid var(--accent-color);
+            padding-left: 1rem;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        /* 導覽列的當前頁面樣式 */
+        .nav-link.active {
+            color: var(--accent-color);
+            font-weight: 600;
+        }
+
+        .aspect-square {
+            aspect-ratio: 1 / 1;
+        }
+    </style>
+</head>
+<body class="bg-[var(--bg-main)]">
+
+    <!-- ===== 網站標頭 (從 kae_blog_template.html 複製) ===== -->
+    <header class="bg-[var(--bg-card)] shadow-sm border-b border-[var(--border-color)] sticky top-0 z-50">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <!-- 左側：小頭貼 + 網站名稱 -->
+            <a href="/" class="flex items-center space-x-3">
+                <img src="https://i.postimg.cc/Z5xySH6x/da-tou-zhao.png" alt="KAE 的大頭照" class="w-10 h-10 mx-auto">
+                <h1 class="text-2xl md:text-3xl font-bold text-[var(--text-primary)]">
+                    KAE的雜記
+                </h1>
+            </a>
+
+            <!-- 右側：導覽列 + 搜尋欄 -->
+            <div class="flex items-center space-x-6">
+                <nav>
+                    <ul class="flex space-x-6">
+                        <li><a href="/" class="nav-link text-lg text-[var(--text-secondary)] hover:text-[var(--accent-color)] transition-colors">首頁</a></li>
+                        <li><a href="/about" class="nav-link text-lg text-[var(--text-secondary)] hover:text-[var(--accent-color)] transition-colors">關於我</a></li>
+                    </ul>
+                </nav>
+
+                <!-- 🔍 搜尋欄位 (Astro 中需要一個真實的搜尋頁面或 API) -->
+                <form action="/search" method="GET" class="flex items-center space-x-2">
+                    <input type="text" name="q" placeholder="搜尋文章..."
+                           class="px-3 py-2 rounded-md border border-[var(--border-color)] text-sm text-[var(--text-primary)] bg-white focus:outline-none focus:ring-2 focus:ring-[var(--accent-color)]">
+                    <button type="submit"
+                            class="px-4 py-2 bg-[var(--accent-color)] text-white text-sm rounded-md hover:bg-[var(--accent-hover)] transition">
+                        搜尋
+                    </button>
+                </form>
+            </div>
+        </div>
+    </header>
+
+    <!-- ===== 主要內容區域 (這裡是「插槽」，頁面內容會被填入) ===== -->
+    <main class="container mx-auto px-6 py-12">
+        <slot /> <!-- Astro 會把 src/pages/ 裡的內容放在這裡 -->
+    </main>
+
+    <!-- ===== 網站頁尾 (從 kae_blog_template.html 複製) ===== -->
+    <footer class="text-center text-[var(--text-secondary)] py-10 mt-12 border-t border-[var(--border-color)]">
+        <p>&copy; 2025 KAE的雜記. All rights reserved.</p>
+    </footer>
+
+    <!-- JavaScript (Astro 會自動處理，舊的 JS 已移除) -->
+</body>
+</html>
