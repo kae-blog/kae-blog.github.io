@@ -1,0 +1,41 @@
+---
+// src/components/Sidebar.astro
+// 這是你的可重複使用「側邊欄」
+// (從 kae_blog_template.html 的首頁右側複製)
+---
+<aside class="md:col-span-1 space-y-8">
+                    
+    <!-- 文章搜尋欄位 (從 kae_blog_template.html 複製) -->
+    <div class="bg-[var(--bg-card)] p-6 rounded-xl shadow-lg">
+        <h3 class="text-xl font-bold text-[var(--text-primary)] mb-4">搜尋文章</h3>
+        <div class="relative">
+            <input type="search" placeholder="請輸入關鍵字..." class="w-full px-4 py-2 border border-[var(--border-color)] rounded-lg focus:ring-2 focus:ring-[var(--accent-color)] focus:outline-none">
+            <svg class="w-5 h-5 text-gray-400 absolute top-1/2 right-3 -translate-y-1/2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+            </svg>                              
+        </div>
+    </div>
+
+    <!-- 個人介紹方塊 (從 kae_blog_template.html 複製) -->
+    <div class="bg-[var(--bg-card)] p-6 rounded-xl shadow-lg text-center">
+        <img src="https://i.postimg.cc/Z5xySH6x/da-tou-zhao.png" alt="かえ (KAE) 的大頭照" class="w-32 mb-4 mx-auto">
+        <h3 class="text-2xl font-bold text-[var(--text-primary)] mb-2">かえ (KAE)</h3>
+        <p class="text-[var(--text-secondary)] text-base leading-relaxed px-2">
+            KAE です！ 這個部落格會來記錄我即將展開的日本交換生活，也會分享留學的事前申請、日本旅遊等經驗。
+        </p>
+        <a href="/about" class="text-sm font-semibold text-[var(--accent-color)] hover:text-[var(--accent-hover)] transition-colors mt-4 inline-block">
+            閱讀更多關於我 &rarr;
+        </a>
+    </div>
+    
+    <!-- 分類方塊 (可編輯) (從 kae_blog_template.html 複製) -->
+    <div class="bg-[var(--bg-card)] p-6 rounded-xl shadow-lg">
+        <h3 class="text-xl font-bold text-[var(--text-primary)] mb-4">文章分類</h3>
+        <ul class="space-y-2">
+            <li><a href="#" class="block text-[var(--text-secondary)] hover:text-[var(--accent-color)] transition-colors">日本留學 (1)</a></li>
+            <li><a href="#" class="block text-[var(--text-secondary)] hover:text-[var(--accent-color)] transition-colors">日本生活 (1)</a></li>
+            <li><a href="#" class="block text-[var(--text-secondary)] hover:text-[var(--accent-color)] transition-colors">隨筆雜記 (0)</a></li>
+        </ul>
+    </div>
+
+</aside>
