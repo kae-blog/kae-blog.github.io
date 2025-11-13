@@ -61,7 +61,7 @@ if (searchQuery) {
                                         <span class="text-sm font-medium text-white bg-[var(--accent-color)] py-1 px-3 rounded-full">{post.data.category}</span>
                                     </div>
                                     <h3 class="text-xl font-bold text-[var(--text-primary)] mb-3">
-                                        <a href={`/blog/${post.slug}`} class="hover:text-[var(--accent-color)] transition-colors">{post.data.title}</a>
+                                        <a href={`/blog/${post.slug}`} class="hover:text-[var(--accent-color)] transition-colors whitespace-pre-line">{post.data.title}</a>
                                     </h3>
                                     <p class="text-[var(--text-secondary)] text-base leading-relaxed mb-4 line-clamp-2">
                                         {post.data.description}
