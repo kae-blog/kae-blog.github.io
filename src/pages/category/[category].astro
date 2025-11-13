@@ -10,15 +10,13 @@ import { getCollection } from 'astro:content';
 // ------------------------------------
 export async function getStaticPaths() {
   const allPosts = await getCollection('blog');
-
-  // 取得所有文章的 category，去重
   const categories = [...new Set(allPosts.map(p => p.data.category).filter(Boolean))];
 
-  // 回傳每個分類要生成的靜態頁路由
-  return categories.map((category) => ({
-    params: { category },
+  return categories.map(category => ({
+    params: { category: category.toString() } // ✅ 字串
   }));
 }
+
 
 // ------------------------------------
 // 📌 2. 取得當前分類及文章列表
