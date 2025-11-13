@@ -16,9 +16,7 @@ const featuredPosts = allPosts
   .sort((a, b) => new Date(b.data.publishDate).getTime() - new Date(a.data.publishDate).getTime())
   .slice(0, 6);
 
-// --- 唯一的修改點在這裡 ---
-// 移除了 .filter(post => !post.data.category?.includes('精選文章'))
-// 現在 "最新文章" 會包含所有文章，依時間排序
+// 這是你最新的邏輯：最新文章「不排除」精選
 const latestPosts = allPosts
   .sort((a, b) => new Date(b.data.publishDate).getTime() - new Date(a.data.publishDate).getTime())
   .slice(0, 5);
@@ -38,8 +36,8 @@ const latestPosts = allPosts
               <div class="w-24 h-24 flex-shrink-0 overflow-hidden border border-[var(--border-color)] mr-4 rounded-lg">
                 <img src={post.data.previewImage} alt={post.data.title} class="w-full h-full object-cover" />
               </div>
-
-              <div class="flex-1 flex flex-col">
+              
+                            <div class="flex-1 flex flex-col">
                 <div class="mb-2 flex flex-wrap gap-1 justify-end">
                   {post.data.category.map(cat => (
                     <a href={`/category/${cat}`} class="text-xs font-medium text-white bg-[var(--accent-color)] py-1 px-2 rounded-full hover:bg-[var(--accent-hover)] transition-colors">
@@ -59,7 +57,7 @@ const latestPosts = allPosts
                   <span>{formatDate(post.data.publishDate)}</span>
                   <div class="flex flex-wrap gap-1">
                     {post.data.tags?.slice(0,3).map(tag => (
-        _             <span class="px-2 py-0.5 rounded-md text-gray-700" style="background-color:#e7f0e2;">{tag}</span>
+                      <span class="px-2 py-0.5 rounded-md text-gray-700" style="background-color:#e7f0e2;">{tag}</span>
                     ))}
                   </div>
                   <a href={`/blog/${post.slug}`} class="text-[var(--accent-color)] hover:underline ml-auto">閱讀 &rarr;</a>
@@ -95,11 +93,11 @@ const latestPosts = allPosts
                   </a>
                 </h3>
                 <p class="text-sm text-[var(--text-secondary)] line-clamp-3 mb-2">{post.data.description}</p>
-                <div class="flex flex-wrap items-center justify-between text-xs text-gray-500 gap-2">
+D               <div class="flex flex-wrap items-center justify-between text-xs text-gray-500 gap-2">
                   <span>{formatDate(post.data.publishDate)}</span>
                   <div class="flex flex-wrap gap-1">
                     {post.data.tags?.slice(0,3).map(tag => (
-                      <span class="px-2 py-0.5 rounded-md text-gray-700" style="background-color:#e7f0e2;">{tag}</span>
+                    m   <span class="px-2 py-0.5 rounded-md text-gray-700" style="background-color:#e7f0e2;">{tag}</span>
                     ))}
                   </div>
                   <a href={`/blog/${post.slug}`} class="text-[var(--accent-color)] hover:underline ml-auto">閱讀 &rarr;</a>
