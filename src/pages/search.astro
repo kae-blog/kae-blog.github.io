@@ -1,5 +1,6 @@
 ---
-// src/pages/search.astro (套用字體縮小)
+// src/pages/search.astro (這是真正修正後的完整版本)
+
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
 
@@ -9,10 +10,15 @@ let filteredPosts = [];
 
 if (searchQuery) {
   const allPosts = await getCollection('blog');
+  
   filteredPosts = allPosts.filter(post => {
-    const title = post.data.title.toLowerCase();
-    const description = post.data.description.toLowerCase();
-    const body = post.body.toLowerCase(); 
+    // --- 關鍵修正：增加防呆機制 ---
+    // 確保所有欄位都是文字，避免 .toLowerCase() 出錯
+    const title = post.data.title?.toLowerCase() || '';
+    const description = post.data.description?.toLowerCase() || '';
+    const body = post.body?.toLowerCase() || ''; // post.body 是文章的原始 Markdown 內文
+
+    // --- 關鍵修正：同時搜尋標題、描述、和內文 ---
     return title.includes(searchQuery) || 
            description.includes(searchQuery) || 
            body.includes(searchQuery);
@@ -28,8 +34,7 @@ if (searchQuery) {
             <input 
                 type="text" 
                 name="q" 
-                value={displayQuery || ''}
-                placeholder="搜尋文章..." 
+                value={displayQuery || ''}  placeholder="搜尋文章..." 
                 class="w-full px-3 py-2 rounded-md border border-[var(--border-color)] text-sm text-[var(--text-primary)] bg-white focus:outline-none focus:ring-2 focus:ring-[var(--accent-color)]"
             >
             <button type="submit" class="px-4 py-2 bg-[var(--accent-color)] text-white text-sm rounded-md hover:bg-[var(--accent-hover)] transition">
