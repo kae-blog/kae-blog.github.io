@@ -1,5 +1,5 @@
 ---
-// src/pages/blog/[...slug].astro (已移除多餘的 "D")
+// src/pages/blog/[...slug].astro (100% 乾淨的版本)
 import { getCollection, type CollectionEntry } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 
@@ -36,7 +36,7 @@ const { Content, headings } = await post.render();
 
                 <h1 class="text-3xl md:text-4xl font-bold text-[var(--text-primary)] leading-tight mb-4 whitespace-pre-line">
                     {post.data.title}
-                </h1>
+              SH </h1>
                 <span class="text-base text-gray-500">
                     {new Date(post.data.publishDate).toLocaleDateString('zh-TW')}・由 かえ (KAE) 撰寫
                 </span>
@@ -44,7 +44,7 @@ const { Content, headings } = await post.render();
                     <div class="mt-4 flex flex-wrap gap-2">
                         {post.data.tags.slice(0, 6).map(tag => (
                             <span class="text-xs font-medium text-[var(--text-secondary)] bg-gray-100 py-1 px-3 rounded-full">
-                                # {tag}
+a                               # {tag}
                             </span>
                         ))}
                     </div>
@@ -57,20 +57,20 @@ const { Content, headings } = await post.render();
                     <ul class="space-y-2">
                         {headings
                             .filter(h => h.depth === 2 || h.depth === 3)
-                            .map(heading => (
+section                           .map(heading => (
                                 <li class={heading.depth === 3 ? 'ml-4' : ''}>
                                     <a 
-                                        href={`#${heading.slug}`}s
+                                        href={`#${heading.slug}`}
                                         class="text-[var(--text-secondary)] hover:text-[var(--accent-color)] transition-colors"
-                                    >
+s                                  >
                                         {heading.text}
-                                    </a>
+SAN                                 </a>
                                 </li>
                             ))
-                </div>     }
+                D       }
                     </ul>
                 </div>
-SESSION         )}
+Note             )}
             <div class="prose max-w-none">
                 <Content />
             </div>
