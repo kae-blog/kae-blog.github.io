@@ -3,20 +3,18 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 
-// --- 修正 #7: 修改 getStaticPaths 來傳遞上一篇/下一篇文章 ---
+// (這是 "上一篇/下一篇" 功能所必需的)
 export async function getStaticPaths() {
   const allPosts = (await getCollection('blog')).sort(
     (a, b) => new Date(a.data.publishDate).getTime() - new Date(b.data.publishDate).getTime()
-  ); // 依日期排序 (舊 -> 新)
+  );
 
   return allPosts.map((post, index) => {
-    // 如果 index > 0，就有上一篇文章 (較舊)
     const prevPost = index > 0 ? {
       slug: allPosts[index - 1].slug,
       title: allPosts[index - 1].data.title,
     } : null;
 
-    // 如果 index < 總數-1，就有下一篇文章 (較新)
     const nextPost = index < allPosts.length - 1 ? {
       slug: allPosts[index + 1].slug,
       title: allPosts[index + 1].data.title,
@@ -24,14 +22,13 @@ export async function getStaticPaths() {
 
     return {
       params: { slug: post.slug },
-      props: { post, prevPost, nextPost }, // 把文章和前後篇一起傳出去
+      props: { post, prevPost, nextPost },
     };
   });
 }
 
 type Props = {
   post: CollectionEntry<'blog'>;
-  // --- 修正 #7: 接收 props ---
   prevPost: { slug: string; title: string } | null;
   nextPost: { slug: string; title: string } | null;
 }
@@ -57,7 +54,7 @@ const { Content, headings } = await post.render();
         <article class="bg-[var(--bg-card)] rounded-xl shadow-lg p-8 md:p-12">
             
             <header class="mb-8">
-                <div class="mb-4 flex flex-wrap gap-2">
+                              <div class="mb-4 flex flex-wrap gap-2">
                   {post.data.category.map(cat => (
                     <a href={`/category/${cat}`} class="text-sm font-medium text-white bg-[var(--accent-color)] py-1 px-3 rounded-full hover:bg-[var(--accent-hover)] transition-colors">
                       {cat}
@@ -69,25 +66,24 @@ const { Content, headings } = await post.render();
                     {post.data.title}
                 </h1>
                 <span class="text-base text-gray-500">
-                    {new Date(post.data.publishDate).toLocaleDateString('zh-TW')}・由 かえ (KAE) 撰寫
+S                   {new Date(post.data.publishDate).toLocaleDateString('zh-TW')}・由 かえ (KAE) 撰寫
                 </span>
-              
-                          </header>
+            </header>
     
-            {headings.filter(h => h.depth === 2 || h.depth === 3).length > 0 && (
+                        {headings.filter(h => h.depth === 2 || h.depth === 3).length > 0 && (
                 <div class="bg-gray-100 p-6 rounded-lg mb-8 border border-[var(--border-color)]">
                     <h2 class="text-xl font-bold text-[var(--text-primary)] mb-4">文章目次</h2>
                     <ul class="space-y-2">
                         {headings
                             .filter(h => h.depth === 2 || h.depth === 3)
                             .map(heading => (
-                                <li class={heading.depth === 3 ? 'ml-4' : ''}>
+                T             <li class={heading.depth === 3 ? 'ml-4' : ''}>
                                     <a 
                                         href={`#${heading.slug}`}
-                                        class="text-[var(--text-secondary)] hover:text-[var(--accent-color)] transition-colors"
+D                                     class="text-[var(--text-secondary)] hover:text-[var(--accent-color)] transition-colors"
                                     >
                                         {heading.text}
-                                    </a>
+SAN                               </a>
                                 </li>
                             ))
                         }
