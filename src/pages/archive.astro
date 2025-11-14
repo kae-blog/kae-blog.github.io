@@ -112,10 +112,8 @@ const allCategories = [...new Set(allPosts.flatMap(post => post.data.category))]
   </div>
 
   <script>
-    // 確保在 Astro 頁面轉場時也能正確執行
-    document.addEventListener('astro:page-load', () => {
-      
-      // --- (1. 定義變數) ---
+    function setupArchiveFilters() {
+      // (1. 抓取所有元件)
       const searchInput = document.getElementById('search-input') as HTMLInputElement;
       const filterButtons = document.querySelectorAll('.category-filter-btn');
       const articleCards = document.querySelectorAll('.article-card');
@@ -126,14 +124,24 @@ const allCategories = [...new Set(allPosts.flatMap(post => post.data.category))]
       let currentSearch = '';
       let currentCategory = 'all';
 
-      // --- (2. 核心篩選函式) ---
+      // --- (2. (新功能!) 讀取 URL 上的 'q' 參數 ---
+      const urlParams = new URLSearchParams(window.location.search);
+      const queryFromUrl = urlParams.get('q'); // 'q' 對應您 <input name="q">
+
+      if (queryFromUrl) {
+        searchInput.value = queryFromUrl; // 把它填入本頁的搜尋框
+        currentSearch = queryFromUrl.toLowerCase().trim(); // 更新篩選變數
+      }
+      // --- (新功能結束) ---
+
+      // (3. 核心篩選函式)
       function runFilter() {
         let visibleCount = 0;
         
         articleCards.forEach(card => {
-          const el = card as HTMLElement;
-          const searchText = el.dataset.searchText || ''; // 已在 HTML 轉為 lowercase
-          const categories = el.dataset.category || '';
+          const el = card as HTMLElement; // 轉型為 HTMLElement
+          const searchText = el.dataset.searchText || ''; // 使用 dataset
+          const categories = el.dataset.category || ''; // 使用 dataset
 
           const matchesSearch = searchText.includes(currentSearch);
           const matchesCategory = currentCategory === 'all' || categories.includes(currentCategory);
@@ -146,10 +154,12 @@ const allCategories = [...new Set(allPosts.flatMap(post => post.data.category))]
           }
         });
 
-        noResultsMessage.style.display = visibleCount === 0 ? 'block' : 'none';
+        if (noResultsMessage) { // 檢查 noResultsMessage 是否存在
+          noResultsMessage.style.display = visibleCount === 0 ? 'block' : 'none';
+        }
       }
 
-      // --- (3. 綁定事件監聽) ---
+      // (4. 綁定事件監聽)
       searchInput.addEventListener('input', (e) => {
         currentSearch = (e.target as HTMLInputElement).value.toLowerCase().trim();
         runFilter();
@@ -157,17 +167,26 @@ const allCategories = [...new Set(allPosts.flatMap(post => post.data.category))]
 
       filterButtons.forEach(button => {
         button.addEventListener('click', () => {
-          filterButtons.forEach(btn => btn.classList.remove('active', 'text-white', 'bg-[var(--accent-color)]'));
+          filterButtons.forEach(btn => {
+            btn.classList.remove('active', 'text-white', 'bg-[var(--accent-color)]');
+            btn.classList.add('text-[var(--text-secondary)]', 'bg-gray-100'); 
+          });
+          
           button.classList.add('active', 'text-white', 'bg-[var(--accent-color)]');
+          button.classList.remove('text-[var(--text-secondary)]', 'bg-gray-100'); 
           
           currentCategory = button.getAttribute('data-category-filter') || 'all';
           runFilter();
         });
       });
 
-      // --- (4. (新功能!) 頁面載入時，讀取 URL 上的關鍵字) ---
-      const urlParams = new URLSearchParams(window.location.search);
-      const queryFromUrl = urlParams.get('q'); // 'q' 對應您 <input name="q">
+      // --- (5. (新功能!) 頁面載入時，立即執行一次篩選) ---
+      // 這會處理掉從 URL 帶來的關鍵字
+      runFilter();
+    }
 
-      if (queryFromUrl) {
-        searchInput.value = queryFromUrl; // 把它填入
+    // 確保在 Astro 頁面轉場時也能正確執行
+    document.addEventListener('astro:page-load', setupArchiveFilters);
+    setupArchiveFilters(); // 也執行一次
+  </script>
+</BaseLayout>
