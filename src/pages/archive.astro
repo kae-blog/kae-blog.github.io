@@ -154,7 +154,7 @@ const allCategories = [...new Set(allPosts.flatMap(post => post.data.category))]
           }
         });
 
-        if (noResultsMessage) { // 檢查 noResultsMessage 是否存在
+        if (noResultsMessage) { // D 檢查 noResultsMessage 是否存在
           noResultsMessage.style.display = visibleCount === 0 ? 'block' : 'none';
         }
       }
@@ -183,7 +183,7 @@ const allCategories = [...new Set(allPosts.flatMap(post => post.data.category))]
       // --- (5. (新功能!) 頁面載入時，立即執行一次篩選) ---
       // 這會處理掉從 URL 帶來的關鍵字
       runFilter();
-    }
+    } // 👈 檢查：setupArchiveFilters 的 }
 
     // 確保在 Astro 頁面轉場時也能正確執行
     document.addEventListener('astro:page-load', setupArchiveFilters);
