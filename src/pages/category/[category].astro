@@ -1,113 +1,87 @@
 ---
-import { getCollection } from "astro:content";
-import type { CollectionEntry } from "astro:content";
+// 檔案路徑: src/pages/category/[category].astro (這是一個新檔案)
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Sidebar from '../../components/Sidebar.astro';
+import { getCollection } from 'astro:content';
 
+// (這是你 index.astro 裡的函式，我們複製過來用)
+const formatDate = (date: Date) => {
+  const d = new Date(date);
+  return `${d.getFullYear()}/${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')}`;
+};
+
+// 1. 告訴 Astro 要產生哪些頁面
 export async function getStaticPaths() {
-  const allPosts = await getCollection("blog");
-  const categories = new Set<string>();
-  allPosts.forEach((post) => {
-    post.data.category.forEach((c: string) => categories.add(c));
-  });
-
-  return Array.from(categories).map((category) => ({
-    params: { category },
+  const allPosts = await getCollection('blog');
+  
+  // 找出所有不重複的分類
+  const allCategories = allPosts.flatMap(post => post.data.category);
+  const uniqueCategories = [...new Set(allCategories)]; // Set 會自動過濾重複
+  
+  // 為每一個分類都產生一個頁面
+  return uniqueCategories.map(cat => ({
+    params: { category: cat },
   }));
 }
 
-// 取得目前頁面的 category
+// 2. 取得這個頁面的分類名稱
 const { category } = Astro.params;
 
-// 取得此分類的文章
-const allPosts = await getCollection("blog");
-const postsInCategory = allPosts
-  .filter((post) => post.data.category.includes(category))
+// 3. 篩選出只屬於這個分類的文章
+const filteredPosts = (await getCollection('blog'))
+  .filter(post => post.data.category.includes(category))
   .sort(
-    (a, b) =>
-      new Date(b.data.publishDate).getTime() -
-      new Date(a.data.publishDate).getTime()
+    (a, b) => new Date(b.data.publishDate).getTime() - new Date(a.data.publishDate).getTime()
   );
 
-// description 截斷函數
-const truncate = (text: string, maxLength = 120) =>
-  text.length > maxLength ? text.slice(0, maxLength) + "…" : text;
+const pageTitle = `分類：${category}`;
 ---
-
-<html lang="zh-Hant">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{category} - KAE的雜記</title>
-    <link rel="stylesheet" href="/_astro/global.css" />
-  </head>
-  <body class="bg-[var(--bg-main)]">
-    <header>
-      <!-- 你的 header 可重用 -->
-    </header>
-
-    <main class="container mx-auto px-6 py-12">
-      <h1 class="text-3xl font-bold text-[var(--text-primary)] mb-6 border-b border-[var(--border-color)]">
-        {category}
-      </h1>
-
-      {postsInCategory.length === 0 ? (
-        <p class="text-[var(--text-secondary)]">此分類尚無文章。</p>
-      ) : (
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {postsInCategory.map((post: CollectionEntry<"blog">) => (
-            <article
-              class="bg-[var(--bg-card)] rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden"
-              key={post.slug}
-            >
-              {/* 上方圖片 1:1 */}
-              <div class="w-full aspect-square overflow-hidden">
-                <img
-                  src={post.data.previewImage || "/images/default.png"}
-                  alt={post.data.title.replace(/\n/g, " ")}
-                  class="w-full h-full object-cover"
-                />
-              </div>
-
-              <div class="p-4">
-                <h2 class="text-lg font-bold text-[var(--text-primary)] mb-2 line-clamp-2 whitespace-pre-line">
-                  <a
-                    href={`/blog/${post.slug}`}
-                    class="hover:text-[var(--accent-color)] transition-colors"
-                  >
-                    {post.data.title}
-                  </a>
-                </h2>
-                <p class="text-sm text-[var(--text-secondary)] line-clamp-3 mb-2">
-                  {truncate(post.data.description || "")}
-                </p>
-
-                <div class="flex flex-wrap items-center justify-between text-xs text-gray-500 gap-2">
-                  <span>{new Date(post.data.publishDate).toLocaleDateString()}</span>
-                  <div class="flex flex-wrap gap-1">
-                    {post.data.category.slice(0, 3).map((tag: string) => (
-                      <span
-                        class="px-2 py-0.5 rounded-md text-gray-700"
-                        style="background-color:#e7f0e2;"
-                      >
+<BaseLayout pageTitle={pageTitle} description={`查看 KAE的雜記 中「${category}」分類的所有文章。`}>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-10 lg:gap-12">
+        <div class="md:col-span-2 space-y-12">
+      <section>
+        <h2 class="text-3xl font-bold text-[var(--text-primary)] mb-6 pb-3 border-b border-[var(--border-color)]">
+          分類：{category} ({filteredPosts.length})
+        </h2>
+        <div class="space-y-4">
+                    {filteredPosts.map(post => (
+            <article class="bg-[var(--bg-card)] rounded-xl shadow-md flex items-center p-4 hover:shadow-lg transition-all duration-300">
+              <div class="w-24 h-24 flex-shrink-0 overflow-hidden border border-[var(--border-color)] mr-4 rounded-lg">
+                <img src={post.data.previewImage} alt={post.data.title} class="w-full h-full object-cover" />
+              </div>
+              <div class="flex-1 flex flex-col">
+                <div class="mb-2 flex flex-wrap gap-1 justify-end">
+                  {post.data.category.map(cat => (
+                    <a href={`/category/${cat}`} class="text-xs font-medium text-white bg-[var(--accent-color)] py-1 px-2 rounded-full hover:bg-[var(--accent-hover)] transition-colors">
+                      {cat}
+                    </a>
+                  ))}
+                </div>
+                <div class="flex-grow">
+                  <h3 class="text-lg font-bold text-[var(--text-primary)] mb-1 line-clamp-2">
+                    <a href={`/blog/${post.slug}`} class="hover:text-[var(--accent-color)] transition-colors whitespace-pre-line">
+                      {post.data.title}
+                    </a>
+                  </h3>
+                  <p class="text-sm text-[var(--text-secondary)] line-clamp-2 mb-2">{post.data.description}</p>
+                </div>
+                <div class="flex flex-wrap items-center justify-between text-xs text-gray-500 gap-x-2 gap-y-1">
+                  <div class="flex flex-wrap items-center gap-x-2 gap-y-1">
+                    <span>{formatDate(post.data.publishDate)}</span>
+                    {post.data.tags?.slice(0, 3).map(tag => (
+                      <span class="px-2 py-0.5 rounded-md text-white text-xs" style="background-color: var(--accent-color);">
                         {tag}
                       </span>
                     ))}
                   </div>
-                  <a
-                    href={`/blog/${post.slug}`}
-                    class="text-[var(--accent-color)] hover:underline ml-auto"
-                  >
-                    閱讀 →
-                  </a>
-                </div>
-              </div>
-            </article>
-          ))}
-        </div>
-      )}
-    </main>
-
-    <footer class="text-center text-[var(--text-secondary)] py-10 mt-12 border-t border-[var(--border-color)]">
-      <p>&copy; 2025 KAE的雜記. All rights reserved.</p>
-    </footer>
-  </body>
-</html>
+                  <a href={`/blog/${post.slug}`} class="text-[var(--accent-color)] hover:underline ml-auto">閱讀 &rarr;</a>
+                </div>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+    </div>
+    <Sidebar />
+  </div>
+</BaseLayout>
