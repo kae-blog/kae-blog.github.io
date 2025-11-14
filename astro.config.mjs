@@ -1,10 +1,15 @@
 import { defineConfig } from 'astro/config';
-import { fileURLToPath } from 'url'; // 👈 1. 加入這行
+import { fileURLToPath } from 'url';
+import tailwind from '@astrojs/tailwind'; // 👈 1. 加入這行 import
 
 export default defineConfig({
-  // ...您其他的 Astro 設定，例如 site, base 等...
+  
+  // 👇 2. 加入這個 integrations 區塊來啟用 Tailwind
+  integrations: [
+    tailwind()
+  ],
 
-  // 👇 2. 加入這個 vite 區塊
+  // 👇 3. 保留您原有的 vite 區塊 (修正 @src 問題)
   vite: {
     resolve: {
       alias: {
