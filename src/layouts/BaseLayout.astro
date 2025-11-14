@@ -1,7 +1,6 @@
 ---
 // src/layouts/BaseLayout.astro
 import { ViewTransitions } from 'astro:transitions';
-// --- 步驟二 (Req 3): 導入作者資訊 ---
 import author from '../data/author.json';
 
 export interface Props {
@@ -93,7 +92,7 @@ const seoDescription = description || defaultDesc;
                 </div>
                 <div class="ml-4 flex-1">
                     <h4 class="text-base font-bold text-[var(--text-primary)]">{author.name}</h4>
-                    <p class="text-sm text-[var(--text-secondary)] line-clamp-2">
+                    <p class="text-sm text-[var(--text-secondary)]">
                         {author.footerBio}
                     </p>
                     <a href="/about" class="text-sm font-semibold text-[var(--accent-color)] hover:text-[var(--accent-hover)] transition-colors mt-1 inline-block">
@@ -109,7 +108,6 @@ const seoDescription = description || defaultDesc;
     </footer>
 
     <script>
-        // ... (你的漢堡選單 <script> 保持不變，為節省篇幅已省略) ...
         function setupMenu() {
             const menuButton = document.getElementById('mobile-menu-button');
             const menuContent = document.getElementById('mobile-menu-content');
