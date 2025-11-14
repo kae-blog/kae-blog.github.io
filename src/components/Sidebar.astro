@@ -1,7 +1,7 @@
 ---
 // 檔案路徑: src/components/Sidebar.astro (修改)
 import { getCollection } from 'astro:content';
-import author from '@src/data/author.json';
+import author from '../data/author.json';
 const allPosts = await getCollection('blog');
 const totalCount = allPosts.length;
 
