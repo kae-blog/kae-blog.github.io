@@ -1,5 +1,5 @@
 ---
-// src/pages/blog/[...slug].astro (已修正)
+// src/pages/blog/[...slug].astro (已移除多餘的 "D")
 import { getCollection, type CollectionEntry } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 
@@ -33,7 +33,8 @@ const { Content, headings } = await post.render();
                     </a>
                   ))}
                 </div>
-                              <h1 class="text-3xl md:text-4xl font-bold text-[var(--text-primary)] leading-tight mb-4 whitespace-pre-line">
+
+                <h1 class="text-3xl md:text-4xl font-bold text-[var(--text-primary)] leading-tight mb-4 whitespace-pre-line">
                     {post.data.title}
                 </h1>
                 <span class="text-base text-gray-500">
@@ -46,7 +47,7 @@ const { Content, headings } = await post.render();
                                 # {tag}
                             </span>
                         ))}
-              V     </div>
+                    </div>
                 )}
             </header>
 
@@ -59,17 +60,17 @@ const { Content, headings } = await post.render();
                             .map(heading => (
                                 <li class={heading.depth === 3 ? 'ml-4' : ''}>
                                     <a 
-                                        href={`#${heading.slug}`} 
+                                        href={`#${heading.slug}`}s
                                         class="text-[var(--text-secondary)] hover:text-[var(--accent-color)] transition-colors"
-a                                     >
+                                    >
                                         {heading.text}
-SAN                                   </a>
+                                    </a>
                                 </li>
                             ))
-                D     }
+                </div>     }
                     </ul>
                 </div>
-            )}
+SESSION         )}
             <div class="prose max-w-none">
                 <Content />
             </div>
