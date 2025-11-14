@@ -114,25 +114,34 @@ const { Content, headings } = await post.render();
 
     </article>
 
-    <nav class="mt-8 grid grid-cols-2 gap-6">
-      <div>
-        {prevPost && (
-          <a href={`/blog/${prevPost.slug}`} class="block bg-[var(--bg-card)] p-4 rounded-lg shadow-md hover:shadow-lg transition-all text-left">
-            <span class="text-sm text-gray-500">&larr; 上一篇文章</span>
-            <span class="block text-base font-semibold text-[var(--accent-color)] mt-1 truncate">{prevPost.title}</span>
-          </a>
-        )}
-      </div>
+<nav class="mt-8 grid grid-cols-1 gap-4">
 
-      <div class="text-right">
-        {nextPost && (
-          <a href={`/blog/${nextPost.slug}`} class="block bg-[var(--bg-card)] p-4 rounded-lg shadow-md hover:shadow-lg transition-all text-right">
-            <span class="text-sm text-gray-500">下一篇文章 &rarr;</span>
-            <span class="block text-base font-semibold text-[var(--accent-color)] mt-1 truncate">{nextPost.title}</span>
-          </a>
-        )}
-      </div>
-    </nav>
+  {prevPost && (
+    <a
+      href={`/blog/${prevPost.slug}`}
+      class="block bg-[var(--bg-card)] p-4 rounded-lg shadow-md hover:shadow-lg transition-all text-left"
+    >
+      <span class="text-sm text-gray-500">&larr; 上一篇文章</span>
+      <span class="block text-base font-semibold text-[var(--accent-color)] mt-1">
+        {prevPost.title}
+      </span>
+    </a>
+  )}
+
+  {nextPost && (
+    <a
+      href={`/blog/${nextPost.slug}`}
+      class="block bg-[var(--bg-card)] p-4 rounded-lg shadow-md hover:shadow-lg transition-all text-left"
+    >
+      <span class="text-sm text-gray-500">下一篇文章 &rarr;</span>
+      <span class="block text-base font-semibold text-[var(--accent-color)] mt-1">
+        {nextPost.title}
+      </span>
+    </a>
+  )}
+
+</nav>
+
 
   </div>
 
