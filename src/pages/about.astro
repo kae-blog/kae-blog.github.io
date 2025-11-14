@@ -1,31 +1,34 @@
 ---
 // src/pages/about.astro
-// 這是你的「關於我」頁面
-
 import BaseLayout from '../layouts/BaseLayout.astro';
+// --- 修正 3a: 導入作者資訊 ---
+import author from '../data/author.json';
+
+// 處理 \n 換行符號，將它們轉換為 <br>
+const formattedBio = author.fullBio.replaceAll('\n', '<br />');
 ---
-<!-- 1. 套用「網站外殼」 -->
-<BaseLayout>
+<BaseLayout
+  pageTitle={`關於 ${author.name}`}
+  description={author.footerBio}
+>
 
-    <!-- 2. 放入 kae_blog_template.html 的 "page-about" 內容 -->
-    <div class="max-w-4xl mx-auto bg-[var(--bg-card)] p-8 md:p-12 rounded-xl shadow-lg">
-        
-        <div class="flex flex-col md:flex-row items-center">
-            <img src="https://i.postimg.cc/Z5xySH6x/da-tou-zhao.png" alt="かえ (KAE) 的大頭照" class="w-40 h-40 md:w-48 md:h-48 shadow-md mb-6 md:mb-0 md:mr-10 flex-shrink-0">
-            
-            <div class="text-center md:text-left">
-                <h2 class="text-4xl font-bold text-[var(--text-primary)] mb-4">關於 かえ (KAE)</h2>
-                <!-- 3. 這裡的 .prose 樣式會被 Tailwind 插件自動套用 -->
-                <div class="prose max-w-none">
-                    <p class="text-xl leading-relaxed">
-                        菓得（かえ）です。<br />
-                        KAE です！ 這個部落格會來記錄我即將展開的日本交換生活，也會分享留學的事前申請、日本旅遊等經驗。<br />
-                        このブログでは留学の準備、日常生活のあれこれを綴っていこうと思います。
-                    </p>
-                </div>
-            </div>
-        </div>
+    <div class="max-w-4xl mx-auto bg-[var(--bg-card)] p-8 md:p-12 rounded-xl shadow-lg">
+        
+        <div class="flex flex-col md:flex-row items-center">
+            <img 
+              src={author.avatar} 
+              alt={`${author.name} 的大頭照`}
+              class="w-40 h-40 md:w-48 md:h-48 mb-6 md:mb-0 md:mr-10 flex-shrink-0"
+            >
+            
+            <div class="text-center md:text-left">
+                              <h2 class="text-4xl font-bold text-[var(--text-primary)] mb-4">關於 {author.name}</h2>
+                <div class="prose max-w-none">
+                                    <p class="text-xl leading-relaxed" set:html={formattedBio} />
+                </div>
+            </div>
+        </div>
 
-    </div>
+    </div>
 
 </BaseLayout>
