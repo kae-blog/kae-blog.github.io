@@ -1,3 +1,4 @@
+---
 // src/pages/blog/[...slug].astro
 import { getCollection, type CollectionEntry } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
@@ -13,19 +14,25 @@ export async function getStaticPaths() {
 type Props = {
   post: CollectionEntry<'blog'>;
 }
+
 const { post } = Astro.props;
 const { Content, headings } = await post.render();
 ---
+
 <BaseLayout
   pageTitle={post.data.title}
   description={post.data.description}
 >
   <div class="max-w-3xl mx-auto">
     <article class="bg-[var(--bg-card)] rounded-xl shadow-lg p-8 md:p-12">
+
       <header class="mb-8">
         <div class="mb-4 flex flex-wrap gap-2">
           {post.data.category.map(cat => (
-            <a href={`/category/${cat}`} class="text-sm font-medium text-white bg-[var(--accent-color)] py-1 px-3 rounded-full hover:bg-[var(--accent-hover)] transition-colors">
+            <a
+              href={`/category/${cat}`}
+              class="text-sm font-medium text-white bg-[var(--accent-color)] py-1 px-3 rounded-full hover:bg-[var(--accent-hover)] transition-colors"
+            >
               {cat}
             </a>
           ))}
@@ -34,9 +41,11 @@ const { Content, headings } = await post.render();
         <h1 class="text-3xl md:text-4xl font-bold text-[var(--text-primary)] leading-tight mb-4 whitespace-pre-line">
           {post.data.title}
         </h1>
+
         <span class="text-base text-gray-500">
           {new Date(post.data.publishDate).toLocaleDateString('zh-TW')}・由 かえ (KAE) 撰寫
         </span>
+
         {post.data.tags && post.data.tags.length > 0 && (
           <div class="mt-4 flex flex-wrap gap-2">
             {post.data.tags.slice(0, 6).map(tag => (
@@ -51,6 +60,7 @@ const { Content, headings } = await post.render();
       {headings.filter(h => h.depth === 2 || h.depth === 3).length > 0 && (
         <div class="bg-gray-100 p-6 rounded-lg mb-8 border border-[var(--border-color)]">
           <h2 class="text-xl font-bold text-[var(--text-primary)] mb-4">文章目次</h2>
+
           <ul class="space-y-2">
             {headings
               .filter(h => h.depth === 2 || h.depth === 3)
@@ -67,9 +77,11 @@ const { Content, headings } = await post.render();
           </ul>
         </div>
       )}
+
       <div class="prose max-w-none">
         <Content />
       </div>
+
     </article>
   </div>
 </BaseLayout>
