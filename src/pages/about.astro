@@ -21,7 +21,7 @@ const formattedBio = author.fullBio.replaceAll('\n', '<br />');
             >
             
                         <div class="w-full text-left">
-                              <h2 class="text-3xl md:text-4xl font-bold text-[var(--text-primary)] mb-4">關於 {author.name}</h2>
+                              <h2 class="text-3xl md:text-4xl font-bold text-[var(--text-primary)] mb-4"> {author.name}</h2>
                 <div class="prose max-w-none">
                     <p class="text-xl leading-relaxed" set:html={formattedBio} />
                 </div>
