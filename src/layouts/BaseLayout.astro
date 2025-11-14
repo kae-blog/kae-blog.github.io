@@ -2,14 +2,33 @@
 // src/layouts/BaseLayout.astro
 import { ViewTransitions } from 'astro:transitions';
 
-const { siteTitle = "KAE的雜記 - 日本留學與生活" } = Astro.props;
+export interface Props {
+    pageTitle?: string;
+    description?: string;
+}
+
+const { pageTitle, description } = Astro.props;
+
+const defaultTitle = "KAE的雜記 - 日本留學與生活";
+const defaultDesc = "KAE です！ 這個部落格會來記錄我即將展開的日本交換生活，也會分享留學的事前申請、日本旅遊等經驗。";
+
+const seoTitle = pageTitle ? `${pageTitle} | KAE的雜記` : defaultTitle;
+const seoDescription = description || defaultDesc;
 ---
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{siteTitle}</title>
+    
+    <title>{seoTitle}</title>
+    <meta name="description" content={seoDescription} />
+    
+    <meta property="og:title" content={seoTitle} />
+    <meta property="og:description" content={seoDescription} />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="https://i.postimg.cc/Z5xySH6x/da-tou-zhao.png" />
+    <meta name="twitter:card" content="summary" />
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -32,6 +51,7 @@ const { siteTitle = "KAE的雜記 - 日本留學與生活" } = Astro.props;
             font-family: 'Inter', 'Noto Sans TC', sans-serif;
             background-color: var(--bg-main); 
             color: var(--text-primary);
+            font-size: 16px;
         }
         
         .prose { color: var(--text-secondary); }
@@ -40,12 +60,12 @@ const { siteTitle = "KAE的雜記 - 日本留學與生活" } = Astro.props;
             border-bottom: 1px solid var(--border-color);
             padding-bottom: 8px;
         }
-        .prose h1 { font-size: 2.25rem; margin-bottom: 1.5rem; }
-        .prose h2 { font-size: 1.875rem; margin-top: 2.5rem; margin-bottom: 1.25rem; }
-        .prose h3 { font-size: 1.5rem; margin-top: 2rem; margin-bottom: 1rem; }
+        .prose h1 { font-size: 2rem; margin-bottom: 1.5rem; }
+        .prose h2 { font-size: 1.5rem; margin-top: 2.5rem; margin-bottom: 1.25rem; }
+        .prose h3 { font-size: 1.25rem; margin-top: 2rem; margin-bottom: 1rem; }
         .prose p, .prose li {
-            font-size: 1.125rem; 
-            line-height: 1.8;
+            font-size: 1rem;
+            line-height: 1.75;
             margin-top: 1.25rem;
             margin-bottom: 1.25rem;
         }
@@ -100,8 +120,9 @@ const { siteTitle = "KAE的雜記 - 日本留學與生活" } = Astro.props;
 
             <div id="mobile-menu-content" class="hidden md:flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-6 w-full md:w-auto mt-4 md:mt-0">
                 <nav>
-                    <ul class="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-6 text-center md:text-left">
+                    <ul class="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-6 text-right md:text-left">
                         <li><a href="/" class="nav-link text-lg text-[var(--text-secondary)] hover:text-[var(--accent-color)] transition-colors">首頁</a></li>
+                        <li><a href="/archive" class="nav-link text-lg text-[var(--text-secondary)] hover:text-[var(--accent-color)] transition-colors">所有文章</a></li>
                         <li><a href="/about" class="nav-link text-lg text-[var(--text-secondary)] hover:text-[var(--accent-color)] transition-colors">關於我</a></li>
                     </ul>
                 </nav>
@@ -122,28 +143,43 @@ const { siteTitle = "KAE的雜記 - 日本留學與生活" } = Astro.props;
         <slot />
     </main>
 
-    <footer class="text-center text-[var(--text-secondary)] py-10 mt-12 border-t border-[var(--border-color)]">
-        <p>&copy; 2025 KAE的雜記. All rights reserved.</p>
+    <footer class="mt-12 border-t border-[var(--border-color)]">
+        
+        <div class="container mx-auto px-6 max-w-2xl py-10">
+            <div class="bg-[var(--bg-card)] rounded-xl shadow-md flex items-center p-4">
+                <div class="flex-shrink-0">
+                    <img src="https://i.postimg.cc/Z5xySH6x/da-tou-zhao.png" alt="かえ (KAE) 的大頭照" class="w-16 h-16 rounded-full border-2 border-[var(--border-color)]">
+                </div>
+                <div class="ml-4 flex-1">
+                    <h4 class="text-base font-bold text-[var(--text-primary)]">かえ (KAE)</h4>
+                    <p class="text-sm text-[var(--text-secondary)] line-clamp-2">
+                        KAE です！ 這個部落格會來記錄我即將展開的日本交換生活，也會分享留學的事前申請、日本旅遊等經驗。
+                    </p>
+                    <a href="/about" class="text-sm font-semibold text-[var(--accent-color)] hover:text-[var(--accent-hover)] transition-colors mt-1 inline-block">
+                        閱讀更多 &rarr;
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center text-[var(--text-secondary)] py-10 border-t border-[var(--border-color)]">
+            <p>&copy; 2025 KAE的雜記. All rights reserved.</p>
+        </div>
     </footer>
 
-<script>
-    function setupMenu() {
-        const menuButton = document.getElementById('mobile-menu-button');
-        const menuContent = document.getElementById('mobile-menu-content');
+    <script>
+        function setupMenu() {
+            const menuButton = document.getElementById('mobile-menu-button');
+            const menuContent = document.getElementById('mobile-menu-content');
 
-        if (menuButton && menuContent) {
-            // 使用 .onclick 來指派功能，可以避免重複綁定監聽器
-            menuButton.onclick = () => {
-                menuContent.classList.toggle('hidden');
-            };
+            if (menuButton && menuContent) {
+                menuButton.onclick = () => {
+                    menuContent.classList.toggle('hidden');
+                };
+            }
         }
-    }
-
-    // 1. 為了初次載入，直接執行一次
-    setupMenu();
-
-    // 2. 為了後續的頁面轉場，監聽 astro:page-load 事件
-    document.addEventListener('astro:page-load', setupMenu);
-</script>
+        setupMenu();
+        document.addEventListener('astro:page-load', setupMenu);
+    </script>
 </body>
 </html>
