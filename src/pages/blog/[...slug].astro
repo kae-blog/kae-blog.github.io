@@ -77,7 +77,6 @@ const { Content, headings } = await post.render();
       {headings.filter(h => h.depth === 2 || h.depth === 3).length > 0 && (
         <div class="bg-gray-100 p-6 rounded-lg mb-8 border border-[var(--border-color)]">
           <h2 class="text-xl font-bold text-[var(--text-primary)] mb-4">文章目次</h2>
-
           <ul class="space-y-2">
             {headings
               .filter(h => h.depth === 2 || h.depth === 3)
@@ -92,104 +91,128 @@ const { Content, headings } = await post.render();
                 </li>
               ))}
           </ul>
-
         </div>
       )}
 
       <div class="prose max-w-none">
         <Content />
-</div>
+      </div>
 
-    <footer class="mt-8 pt-6 border-t border-[var(--border-color)]">
-      
-      {post.data.tags && post.data.tags.length > 0 && (
-        <div class="flex flex-wrap items-center gap-2">
-          <span class="text-sm font-semibold text-[var(--text-secondary)]">Tags:</span>
-          {post.data.tags.map(tag => (
-            <span class="px-2 py-0.5 rounded-md text-gray-700 text-xs" style="background-color: #e7f0e2;">
-              {tag}
-            </span>
-          ))}
-        </div>
-      )}
+      <footer class="mt-8 pt-6 border-t border-[var(--border-color)]">
+        
+        {post.data.tags && post.data.tags.length > 0 && (
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="text-sm font-semibold text-[var(--text-secondary)]">Tags:</span>
+            {post.data.tags.map(tag => (
+              <span class="px-2 py-0.5 rounded-md text-gray-700 text-xs" style="background-color: #e7f0e2;">
+                {tag}
+              </span>
+            ))}
+          </div>
+        )}
 
-      <div class="mt-8">
-        <span class="text-lg font-semibold text-[var(--text-primary)]">分享此文</span>
-        <div class="flex flex-wrap gap-2 mt-3">
+        <div class={`flex flex-wrap gap-2 ${post.data.tags && post.data.tags.length > 0 ? 'mt-8' : ''}`}>
+          
           <button 
             id="copy-link-btn" 
             class="text-sm font-medium text-white bg-[var(--accent-color)] py-1.5 px-3 rounded-full hover:bg-[var(--accent-hover)] transition-colors"
           >
             複製連結
           </button>
+
+          <button 
+            id="native-share-btn" 
+            class="hidden text-sm font-medium text-white bg-[var(--accent-color)] py-1.5 px-3 rounded-full hover:bg-[var(--accent-hover)] transition-colors"
+          >
+            分享此文
+          </button>
         </div>
-      </div>
-    </footer>
-    </article>
+      </footer>
+      </article>
 
-<nav class="mt-8 grid grid-cols-1 gap-4">
-
-  {prevPost && (
-    <a
-      href={`/blog/${prevPost.slug}`}
-      class="block bg-[var(--bg-card)] p-4 rounded-lg shadow-md hover:shadow-lg transition-all text-left"
-    >
-      <span class="text-sm text-gray-500">&larr; 上一篇文章</span>
-      <span class="block text-base font-semibold text-[var(--accent-color)] mt-1">
-        {prevPost.title}
-      </span>
-    </a>
-  )}
-
-  {nextPost && (
-    <a
-      href={`/blog/${nextPost.slug}`}
-      class="block bg-[var(--bg-card)] p-4 rounded-lg shadow-md hover:shadow-lg transition-all text-left"
-    >
-      <span class="text-sm text-gray-500">下一篇文章 &rarr;</span>
-      <span class="block text-base font-semibold text-[var(--accent-color)] mt-1">
-        {nextPost.title}
-      </span>
-    </a>
-  )}
-
-</nav>
-
-
+    <nav class="mt-8 grid grid-cols-1 gap-4">
+      {prevPost && (
+        <a
+          href={`/blog/${prevPost.slug}`}
+          class="block bg-[var(--bg-card)] p-4 rounded-lg shadow-md hover:shadow-lg transition-all text-left"
+        >
+          <span class="text-sm text-gray-500">&larr; 上一篇文章</span>
+          <span class="block text-base font-semibold text-[var(--accent-color)] mt-1">
+            {prevPost.title}
+          </span>
+        </a>
+      )}
+      {nextPost && (
+        <a
+          href={`/blog/${nextPost.slug}`}
+          class="block bg-[var(--bg-card)] p-4 rounded-lg shadow-md hover:shadow-lg transition-all text-left"
+        >
+          <span class="text-sm text-gray-500">下一篇文章 &rarr;</span>
+          <span class="block text-base font-semibold text-[var(--accent-color)] mt-1">
+            {nextPost.title}
+          </span>
+        </a>
+      )}
+    </nav>
   </div>
-</div> <script>
-    // 監聽 Astro 頁面轉場
-    document.addEventListener('astro:page-load', () => {
-      const copyButton = document.getElementById('copy-link-btn');
-      
-      // 確保按鈕存在於這個頁面
+
+  <script>
+    // 建立一個函式來設定按鈕，這樣 astro:page-load 才能重複呼叫
+    function setupShareButtons() {
+      const copyButton = document.getElementById('copy-link-btn') as HTMLButtonElement;
+      const shareButton = document.getElementById('native-share-btn') as HTMLButtonElement;
+
+      // --- 1. 原生分享 (Native Share) 按鈕邏輯 ---
+      if (navigator.share && shareButton) {
+        // 如果瀏覽器支援 navigator.share，就顯示「分享此文」按鈕
+        shareButton.classList.remove('hidden');
+        
+        // 加上點擊事件
+        if (shareButton.dataset.listenerAttached !== 'true') {
+          shareButton.addEventListener('click', async () => {
+            try {
+              await navigator.share({
+                title: document.title, // 分享的標題 (自動抓取頁面標題)
+                text: document.querySelector('meta[name="description"]')?.getAttribute('content') || '', // 分享的描述 (自動抓取頁面描述)
+                url: window.location.href, // 分享的網址 (當前網址)
+              });
+            } catch (err) {
+              console.error('Error with native share: ', err);
+            }
+          });
+          shareButton.dataset.listenerAttached = 'true';
+        }
+      }
+
+      // --- 2. 複製連結 (Copy Link) 按鈕邏輯 ---
       if (copyButton) {
-        // 檢查是否已經綁定過事件，避免重複綁定
         if (copyButton.dataset.listenerAttached !== 'true') {
-          
           copyButton.addEventListener('click', () => {
-            // 抓取當前頁面的網址並複製
             navigator.clipboard.writeText(window.location.href)
               .then(() => {
-                // 提供反饋
                 const originalText = copyButton.textContent;
                 copyButton.textContent = '已複製！';
-                copyButton.disabled = true; // 暫時禁用按鈕
+                copyButton.disabled = true;
                 
                 setTimeout(() => {
                   copyButton.textContent = originalText;
-                  copyButton.disabled = false; // 恢復按鈕
-                }, 2000); // 2 秒後恢復
+                  copyButton.disabled = false;
+                }, 2000);
               })
               .catch(err => {
                 console.error('無法複製連結: ', err);
                 copyButton.textContent = '複製失敗';
               });
           });
-          // 標記為已綁定
           copyButton.dataset.listenerAttached = 'true';
         }
       }
-    });
+    }
+
+    // 監聽 Astro 頁面轉場
+    document.addEventListener('astro:page-load', setupShareButtons);
+    // 也在頁面初次載入時執行
+    setupShareButtons();
   </script>
+
 </BaseLayout>
