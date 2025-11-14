@@ -1,7 +1,16 @@
 ---
-// src/components/Sidebar.astro
-// 這是你的可重複使用「側邊欄」
-// (已移除多餘的搜尋框)
+// 檔案路徑: src/components/Sidebar.astro (修改)
+import { getCollection } from 'astro:content';
+
+const allPosts = await getCollection('blog');
+const totalCount = allPosts.length;
+
+// 1. 建立一個 Map 來計算每個分類有幾篇文章
+// (例如: {'日本留學' => 1, '精選文章' => 1})
+const categoryCounts = new Map<string, number>();
+allPosts.flatMap(post => post.data.category).forEach(cat => {
+  categoryCounts.set(cat, (categoryCounts.get(cat) || 0) + 1);
+});
 ---
 <aside class="md:col-span-1 space-y-8">
     
@@ -19,9 +28,18 @@
     <div class="bg-[var(--bg-card)] p-6 rounded-xl shadow-lg">
         <h3 class="text-xl font-bold text-[var(--text-primary)] mb-4">文章分類</h3>
         <ul class="space-y-2">
-            <li><a href="#" class="block text-[var(--text-secondary)] hover:text-[var(--accent-color)] transition-colors">日本留學 (1)</a></li>
-            <li><a href="#" class="block text-[var(--text-secondary)] hover:text-[var(--accent-color)] transition-colors">日本生活 (1)</a></li>
-            <li><a href="#" class="block text-[var(--text-secondary)] hover:text-[var(--accent-color)] transition-colors">隨筆雜記 (0)</a></li>
+            <li>
+                <a href="/archive" class="block text-[var(--text-secondary)] hover:text-[var(--accent-color)] transition-colors">
+                    所有文章 ({totalCount})
+                </a>
+            </li>
+            {Array.from(categoryCounts.entries()).map(([category, count]) => (
+                <li>
+                    <a href={`/category/${category}`} class="block text-[var(--text-secondary)] hover:text-[var(--accent-color)] transition-colors">
+                        {category} ({count})
+                    </a>
+                </li>
+            ))}
         </ul>
     </div>
 
