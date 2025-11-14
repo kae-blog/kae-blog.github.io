@@ -2,6 +2,7 @@
 // src/layouts/BaseLayout.astro
 import { ViewTransitions } from 'astro:transitions';
 import author from '../data/author.json';
+import "../styles/global.css";
 
 // --- 修正 1: 處理 footerBio 的換行 ---
 const formattedFooterBio = author.footerBio.replaceAll('\n', '<br />');
@@ -21,47 +22,7 @@ const seoDescription = description || defaultDesc;
 ---
 <!DOCTYPE html>
 <html lang="zh-Hant">
-<head>
-    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>{seoTitle}</title><meta name="description" content={seoDescription} /><meta property="og:title" content={seoTitle} /><meta property="og:description" content={seoDescription} /><meta property="og:type" content="website" /><meta property="og:image" content="https://i.postimg.cc/Z5xySH6x/da-tou-zhao.png" /><meta name="twitter:card" content="summary" /><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet"><ViewTransitions />
-    <style is:global>
-/* 👇 1. 啟動 Tailwind CSS 的三行指令
-    */
-    @tailwind base;
-    @tailwind components;
-    @tailwind utilities;
-        :root {
-            --bg-main: #e7f0e2;
-            --bg-card: #ffffff;
-            --text-primary: #333333;
-            --text-secondary: #555555;
-            --accent-color: #6a8b6a; 
-            --accent-hover: #587458; 
-            --border-color: #e5e5e5;
-        }
-        body { font-family: 'Inter', 'Noto Sans TC', sans-serif; background-color: var(--bg-main); color: var(--text-primary); font-size: 16px; }
-        .prose { color: var(--text-secondary); }
-        .prose h1, .prose h2, .prose h3 { color: var(--text-primary); border-bottom: 1px solid var(--border-color); padding-bottom: 8px; }
-        .prose h1 { font-size: 2rem; margin-bottom: 1.5rem; }
-        .prose h2 { font-size: 1.5rem; margin-top: 2.5rem; margin-bottom: 1.25rem; }
-        .prose h3 { font-size: 1.25rem; margin-top: 2rem; margin-bottom: 1rem; }
-        .prose p, .prose li { font-size: 1rem; line-height: 1.75; margin-top: 1.25rem; margin-bottom: 1.25rem; }
-        .prose strong { color: var(--text-primary); }
-        .prose a { color: var(--accent-color); text-decoration: none; }
-        .prose a:hover { text-decoration: underline; }
-        .prose img { border-radius: 0.75rem; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-top: 1.5rem; margin-bottom: 1.5rem; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; }
-        .prose ul, .prose ol { padding-left: 1.75rem; }
-        .prose li { margin-top: 0.5rem; margin-bottom: 0.5rem; }
-        .prose blockquote { border-left: 4px solid var(--accent-color); padding-left: 1rem; color: var(--text-secondary); font-style: italic; }
-        
-        /* --- 修正 2: 加入日文字體 CSS --- */
-        /* 這會套用在 `about.astro` 的 .prose 區塊中 */
-        .prose [lang="ja"] {
-            font-family: 'Noto Sans JP', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
-        }
 
-        .nav-link.active { color: var(--accent-color); font-weight: 600; }
-        .aspect-square { aspect-ratio: 1 / 1; }
-    </style>
 </head>
 <body class="bg-[var(--bg-main)]">
 
