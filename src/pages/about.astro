@@ -14,11 +14,11 @@ const formattedBio = author.fullBio.replaceAll('\n', '<br />');
     <div class="max-w-4xl mx-auto bg-[var(--bg-card)] p-8 md:p-12 rounded-xl shadow-lg">
         
         <div class="flex flex-col md:flex-row items-center">
-            <img 
-              src={author.avatar} 
-              alt={`${author.name} 的大頭照`}
-              class="w-40 h-40 md:w-48 md:h-48 mb-6 md:mb-0 md:mr-10 flex-shrink-0"
-            >
+<img 
+  src={author.avatar} 
+  alt={`${author.name} 的大頭照`}
+  class="w-40 h-40 md:w-48 md:h-48 mb-6 md:mb-0 md:mr-10 flex-shrink-0 rounded-full"
+>
             
                         <div class="w-full text-left">
                               <h2 class="text-3xl md:text-4xl font-bold text-[var(--text-primary)] mb-4"> {author.name}</h2>
