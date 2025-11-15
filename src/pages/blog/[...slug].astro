@@ -1,5 +1,5 @@
 ---
-// src/pages/blog/[...slug].astro
+// src/pages/blog/[...slug].astro (已加入手動留言)
 import { getCollection, type CollectionEntry } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 
@@ -34,6 +34,9 @@ type Props = {
 
 const { post, prevPost, nextPost } = Astro.props;
 const { Content, headings } = await post.render();
+
+// (修正 1) 加回您遺失的 Google Apps Script 網址
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxw-KeAWJtanPCNGpVyydYoeLrQqMUZ_lvOqegTmPi7CUZCDF-Fz4k37iJU6XilsDpZgg/exec";
 ---
 
 <BaseLayout
@@ -128,76 +131,96 @@ const { Content, headings } = await post.render();
           </button>
         </div>
       </footer>
-      </article>
+    </article>
 
-<div 
-        id="comment-section" 
-        class="mt-12 bg-[var(--bg-card)] rounded-xl shadow-lg p-8 md:p-12"
-        data-article-slug={post.slug} data-api-url={GOOGLE_SCRIPT_URL} >
-        <h3 class="text-2xl font-bold text-[var(--text-primary)] mb-6">訪客留言</h3>
+    <div 
+      id="comment-section" 
+      class="mt-12 bg-[var(--bg-card)] rounded-xl shadow-lg p-8 md:p-12"
+      data-article-slug={post.slug}
+      data-api-url={GOOGLE_SCRIPT_URL}
+    >
+      <h3 class="text-2xl font-bold text-[var(--text-primary)] mb-6">訪客留言</h3>
+      
+      <form id="comment-form" class="space-y-4 mb-10">
+        <div>
+          <label for="comment-name" class="block text-sm font-semibold text-[var(--text-secondary)] mb-2">您的名稱 (必填)</label>
+          <input 
+            type="text" 
+            id="comment-name" 
+            name="name" 
+            required
+            class="w-full px-3 py-2 rounded-md border border-[var(--border-color)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--accent-color)]"
+          />
+        </div>
+        <div>
+          <label for="comment-email" class="block text-sm font-semibold text-[var(--text-secondary)] mb-2">您的 Email (選填，不會公開)</label>
+          <input 
+            type="email" 
+            id="comment-email" 
+            name="email"
+            class="w-full px-3 py-2 rounded-md border border-[var(--border-color)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--accent-color)]"
+          />
+        </div>
+        <div>
+          <label for="comment-content" class="block text-sm font-semibold text-[var(--text-secondary)] mb-2">您的留言 (必填)</label>
+          <textarea 
+            id="comment-content" 
+            name="content" 
+            rows="4" 
+            required
+            class="w-full px-3 py-2 rounded-md border border-[var(--border-color)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--accent-color)]"
+          ></textarea>
+        </div>
         
-        <form id="comment-form" class="space-y-4 mb-10">
-          <div>
-            <label for="comment-name" class="block text-sm font-semibold text-[var(--text-secondary)] mb-2">您的名稱 (必填)</label>
-            <input 
-              type="text" 
-              id="comment-name" 
-              name="name" 
-              required
-              class="w-full px-3 py-2 rounded-md border border-[var(--border-color)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--accent-color)]"
-            />
-          </div>
-          <div>
-            <label for="comment-email" class="block text-sm font-semibold text-[var(--text-secondary)] mb-2">您的 Email (選填，不會公開)</label>
-            <input 
-              type="email" 
-              id="comment-email" 
-              name="email"
-              class="w-full px-3 py-2 rounded-md border border-[var(--border-color)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--accent-color)]"
-            />
-          </div>
-          <div>
-            <label for="comment-content" class="block text-sm font-semibold text-[var(--text-secondary)] mb-2">您的留言 (必填)</label>
-            <textarea 
-              id="comment-content" 
-              name="content" 
-              rows="4" 
-              required
-              class="w-full px-3 py-2 rounded-md border border-[var(--border-color)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--accent-color)]"
-            ></textarea>
-          </div>
-          
-          <div class="flex items-center">
-            <input 
-              type="checkbox" 
-              id="comment-showOnSite" 
-              name="showOnSite" 
-              checked 
-              class="h-4 w-4 text-[var(--accent-color)] border-[var(--border-color)] rounded focus:ring-[var(--accent-color)]"
-            />
-            <label for="comment-showOnSite" class="ml-2 block text-sm text-[var(--text-secondary)]">
-              我同意將此留言（名稱與內容）公開顯示
-            </label>
-          </div>
+        <div class="flex items-center">
+          <input 
+            type="checkbox" 
+            id="comment-showOnSite" 
+            name="showOnSite" 
+            checked 
+            class="h-4 w-4 text-[var(--accent-color)] border-[var(--border-color)] rounded focus:ring-[var(--accent-color)]"
+          />
+          <label for="comment-showOnSite" class="ml-2 block text-sm text-[var(--text-secondary)]">
+            我同意將此留言（名稱與內容）公開顯示
+          </label>
+        </div>
 
-          <div class="pt-2">
-            <button 
-              type="submit"
-              id="comment-submit-btn"
-              class="px-5 py-2 bg-[var(--accent-color)] text-white text-base font-medium rounded-md hover:bg-[var(--accent-hover)] transition disabled:opacity-50"
-            >
-              送出留言
-            </button>
-            <span id="comment-success-msg" class="hidden ml-4 text-green-600 font-semibold">✓ 留言已送出！</span>
-            <span id="comment-error-msg" class="hidden ml-4 text-red-600 font-semibold">✗ 送出失敗，請稍後再試。</span>
-          </div>
-        </form>
+        <div class="pt-2">
+          <button 
+            type="submit"
+            id="comment-submit-btn"
+            class="px-5 py-2 bg-[var(--accent-color)] text-white text-base font-medium rounded-md hover:bg-[var(--accent-hover)] transition disabled:opacity-50"
+          >
+            送出留言
+          </button>
+          <span id="comment-success-msg" class="hidden ml-4 text-green-600 font-semibold">✓ 留言已送出！</span>
+          <span id="comment-error-msg" class="hidden ml-4 text-red-600 font-semibold">✗ 送出失敗，請稍後再試。</span>
+        </div>
+      </form>
 
-        <div id="comment-display-list" class="space-y-6 border-t border-[var(--border-color)] pt-10">
-          <p id="comment-loading-msg" class="text-center text-[var(--text-secondary)]">留言載入中...</p>
+      <div id="comment-display-list" class="space-y-6 border-t border-[var(--border-color)] pt-10">
+        
+        <div class="flex space-x-4">
+          <div class="flex-shrink-0">
+            <div class="w-10 h-10 rounded-full bg-[var(--accent-color)] flex items-center justify-center text-white font-semibold text-lg">
+              K
+            </div>
           </div>
+          <div class="flex-1">
+            <div class="flex items-baseline space-x-2">
+              <span class="font-bold text-[var(--text-primary)]">KAE (站長)</span>
+              <span class="text-xs text-gray-500">2025/11/15</span>
+            </div>
+            <p class="text-base text-[var(--text-secondary)] mt-2 whitespace-pre-line">
+              歡迎留言！有任何問題都可以在這裡提出喔。
+            </p> 
+          </div>
+        </div>
+        <p id="comment-loading-msg" class="text-center text-[var(--text-secondary)]">留言載入中...</p>
       </div>
-      <nav class="mt-8 grid grid-cols-1 gap-4">
+    </div>
+
+    <nav class="mt-8 grid grid-cols-1 gap-4">
       {prevPost && (
         <a
           href={`/blog/${prevPost.slug}`}
@@ -224,24 +247,22 @@ const { Content, headings } = await post.render();
   </div>
 
   <script>
-    // 建立一個函式來設定按鈕，這樣 astro:page-load 才能重複呼叫
+    // ---------------------------------
+    // 1. 分享按鈕的邏輯
+    // ---------------------------------
     function setupShareButtons() {
       const copyButton = document.getElementById('copy-link-btn') as HTMLButtonElement;
       const shareButton = document.getElementById('native-share-btn') as HTMLButtonElement;
 
-      // --- 1. 原生分享 (Native Share) 按鈕邏輯 ---
       if (navigator.share && shareButton) {
-        // 如果瀏覽器支援 navigator.share，就顯示「分享此文」按鈕
         shareButton.classList.remove('hidden');
-        
-        // 加上點擊事件
         if (shareButton.dataset.listenerAttached !== 'true') {
           shareButton.addEventListener('click', async () => {
             try {
               await navigator.share({
-                title: document.title, // 分享的標題 (自動抓取頁面標題)
-                text: document.querySelector('meta[name="description"]')?.getAttribute('content') || '', // 分享的描述 (自動抓取頁面描述)
-                url: window.location.href, // 分享的網址 (當前網址)
+                title: document.title,
+                text: document.querySelector('meta[name="description"]')?.getAttribute('content') || '',
+                url: window.location.href,
               });
             } catch (err) {
               console.error('Error with native share: ', err);
@@ -251,7 +272,6 @@ const { Content, headings } = await post.render();
         }
       }
 
-      // --- 2. 複製連結 (Copy Link) 按鈕邏輯 ---
       if (copyButton) {
         if (copyButton.dataset.listenerAttached !== 'true') {
           copyButton.addEventListener('click', () => {
@@ -275,33 +295,39 @@ const { Content, headings } = await post.render();
         }
       }
     }
-// ---------------------------------
-    // 2. Google Sheets 留言系統邏輯 (新加入的)
+
+    // ---------------------------------
+    // 2. Google Sheets 留言系統邏輯
     // ---------------------------------
     function setupCommentSystem() {
       const commentSection = document.getElementById('comment-section');
-      if (!commentSection) return; // 如果沒有留言區塊，就跳出
+      if (!commentSection) return; 
       
-      const WEB_APP_URL = commentSection.dataset.apiUrl;
-      const ARTICLE_SLUG = commentSection.dataset.articleSlug;
+      const WEB_APP_URL = (commentSection as HTMLElement).dataset.apiUrl;
+      const ARTICLE_SLUG = (commentSection as HTMLElement).dataset.articleSlug;
       
       const commentForm = document.getElementById('comment-form') as HTMLFormElement;
       const submitButton = document.getElementById('comment-submit-btn') as HTMLButtonElement;
-      const successMsg = document.getElementById('comment-success-msg');
-      const errorMsg = document.getElementById('comment-error-msg');
+      const successMsg = document.getElementById('comment-success-msg') as HTMLElement;
+      const errorMsg = document.getElementById('comment-error-msg') as HTMLElement;
       
-      const displayList = document.getElementById('comment-display-list');
-      const loadingMsg = document.getElementById('comment-loading-msg');
-      // const emptyMsg = document.getElementById('comment-empty-msg');
+      const displayList = document.getElementById('comment-display-list') as HTMLElement;
+      const loadingMsg = document.getElementById('comment-loading-msg') as HTMLElement;
 
       if (!commentForm || !displayList || !WEB_APP_URL || !ARTICLE_SLUG) return;
 
       // ----- 函式 2.1: 抓取並顯示留言 -----
       async function fetchComments() {
         if (loadingMsg) loadingMsg.style.display = 'block';
-        // if (emptyMsg) emptyMsg.style.display = 'none';
-        displayList.innerHTML = ''; // 清空舊留言 (除了 loading)
-        displayList.appendChild(loadingMsg);
+        
+        // (修正 3) 抓取留言時，不要清空「手動」的留言
+        // 1. 找出所有「動態」留言並刪除
+        const dynamicComments = displayList.querySelectorAll('.dynamic-comment');
+        dynamicComments.forEach(comment => comment.remove());
+        
+        // 2. 找出「尚無留言」或「錯誤」的訊息並刪除
+        const statusMessages = displayList.querySelectorAll('.status-message');
+        statusMessages.forEach(msg => msg.remove());
 
         try {
           const response = await fetch(`${WEB_APP_URL}?slug=${ARTICLE_SLUG}`);
@@ -309,18 +335,21 @@ const { Content, headings } = await post.render();
           
           const result = await response.json();
           
+          if (loadingMsg) loadingMsg.style.display = 'none';
+
           if (result.result === 'success' && result.data) {
-            displayList.innerHTML = ''; // 抓到了，清空 loading
             
-            if (result.data.length === 0) {
-              // if (emptyMsg) emptyMsg.style.display = 'block';
-              displayList.innerHTML = '<p class="text-center text-[var(--text-secondary)]">還沒有人留言，快來搶頭香！</p>';
+            // 檢查手動留言之外，是否還有動態留言
+            const manualCommentCount = displayList.querySelectorAll('.flex.space-x-4').length - dynamicComments.length;
+
+            if (result.data.length === 0 && manualCommentCount === 0) {
+              displayList.innerHTML += '<p class="text-center text-[var(--text-secondary)] status-message">還沒有人留言，快來搶頭香！</p>';
             } else {
               result.data.forEach(comment => {
                 const commentEl = document.createElement('div');
-                commentEl.className = 'flex space-x-4';
+                // (修正 3) 加上 'dynamic-comment' class
+                commentEl.className = 'flex space-x-4 dynamic-comment'; 
                 
-                // 格式化日期 (例如: 2025/11/15 下午3:30)
                 const formattedDate = new Date(comment.timestamp).toLocaleString('zh-TW', {
                   year: 'numeric',
                   month: '2-digit',
@@ -353,21 +382,20 @@ const { Content, headings } = await post.render();
         } catch (err) {
           console.error('抓取留言失敗:', err);
           if (loadingMsg) loadingMsg.style.display = 'none';
-          displayList.innerHTML = '<p class="text-center text-red-500">無法載入留言...</p>';
+          displayList.innerHTML += '<p class="text-center text-red-500 status-message">無法載入留言...</p>';
         }
       }
 
       // ----- 函式 2.2: 處理表單提交 -----
       if (commentForm.dataset.listenerAttached !== 'true') {
         commentForm.addEventListener('submit', async (e) => {
-          e.preventDefault(); // 阻止表單傳統提交
+          e.preventDefault(); 
           
           submitButton.disabled = true;
           submitButton.textContent = '送出中...';
           if (successMsg) successMsg.style.display = 'none';
           if (errorMsg) errorMsg.style.display = 'none';
           
-          // 取得表單資料
           const formData = new FormData(commentForm);
           const data = {
             name: formData.get('name') as string,
@@ -385,7 +413,7 @@ const { Content, headings } = await post.render();
               redirect: 'follow',
               body: JSON.stringify(data),
               headers: {
-                'Content-Type': 'text/plain;charset=utf-8', // Apps Script 的特例
+                'Content-Type': 'text/plain;charset=utf-8', 
               }
             });
             
@@ -393,11 +421,9 @@ const { Content, headings } = await post.render();
 
             if (result.result === 'success') {
               if (successMsg) successMsg.style.display = 'inline';
-              commentForm.reset(); // 清空表單
+              commentForm.reset(); 
               
-              // 如果使用者同意公開，就立刻重新抓取留言
               if (data.showOnSite) {
-                // 稍微延遲一下，給 Google Sheet 1秒鐘的時間更新
                 setTimeout(fetchComments, 1000); 
               }
             } else {
