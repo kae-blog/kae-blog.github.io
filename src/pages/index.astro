@@ -9,10 +9,11 @@ const formatDate = (date: Date) => {
   return `${d.getFullYear()}/${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')}`;
 };
 
-const allPosts = await getCollection('blog');
-.filter(post => !post.data.draft); // 👈 新增：過濾掉草稿，並將結果儲存給 allPosts
+const allPosts = (await getCollection('blog'))
+  .filter(post => !post.data.draft); // 
 
 // 後續的 featuredPosts 和 latestPosts 邏輯會自動使用這個已過濾的清單。
+
 const featuredPosts = allPosts
   .filter(post => post.data.category?.includes('精選文章'))
   .sort((a, b) => new Date(b.data.publishDate).getTime() - new Date(a.data.publishDate).getTime())
