@@ -5,9 +5,11 @@ import { getCollection, type CollectionEntry } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 
 export async function getStaticPaths() {
-  const allPosts = (await getCollection('blog')).sort(
-    (a, b) => new Date(a.data.publishDate).getTime() - new Date(b.data.publishDate).getTime()
-  );
+  const allPosts = (await getCollection('blog'))
+    .filter(post => !post.data.draft) // 👈 新增：過濾掉所有 draft: true 的文章
+    .sort(
+    (a, b) => new Date(a.data.publishDate).getTime() - new Date(b.data.publishDate).getTime()
+  );
 
   return allPosts.map((post, index) => {
     const prevPost = index > 0 ? {
@@ -35,34 +37,37 @@ type Props = {
 
 const { post, prevPost, nextPost } = Astro.props;
 const { Content, headings } = await post.render();
-// (新) 建立 Schema.org 結構化資料
+// 建立 Schema.org 結構化資料
 const siteUrl = Astro.site; // 取得 astro.config.mjs 中的 'site'
+
+// 👇👇👇 新增：Google 搜尋的圖片 (優先用 1:1 的 previewImage，達成您的目標)
+const googleSearchImage = new URL(post.data.previewImage || post.data.heroImage || '/images/og_default.png', siteUrl).href;
 
 // 1. 通用文章 Schema (所有文章都有)
 const blogPostingSchema = {
-  "@context": "https://schema.org",
-  "@type": "BlogPosting",
-  "headline": post.data.title,
-  "description": post.data.description,
-  // 必須是絕對路徑
-  "image": new URL(post.data.heroImage || '/images/og_default.png', siteUrl).href, 
-  "datePublished": post.data.publishDate.toISOString(),
-  "author": {
-    "@type": "Person",
-    "name": "KAE" // 根據您的模板
-  }
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": post.data.title,
+  "description": post.data.description,
+  // 必須是絕對路徑
+  "image": googleSearchImage, // 👈 修改：使用方形圖給 Google
+  "datePublished": post.data.publishDate.toISOString(),
+  "author": {
+    "@type": "Person",
+    "name": "KAE" 
+  }
 };
 
 // 2. 食譜 Schema (條件式)
 let recipeSchema = null;
 // 檢查 .md 檔案中是否有 isRecipe: true 且提供了材料和步驟
 if (post.data.isRecipe && post.data.recipeIngredients && post.data.recipeInstructions) {
-  recipeSchema = {
-    "@context": "https://schema.org/",
-    "@type": "Recipe",
-    "name": post.data.title,
-    "image": new URL(post.data.heroImage || '/images/og_default.png', siteUrl).href,
-    "description": post.data.description,
+  recipeSchema = {
+    "@context": "https://schema.org/",
+    "@type": "Recipe",
+    "name": post.data.title,
+    "image": googleSearchImage, // 👈 修改：使用方形圖給 Google
+    "description": post.data.description,
     "author": {
       "@type": "Person",
       "name": "KAE" // (您已修改)
