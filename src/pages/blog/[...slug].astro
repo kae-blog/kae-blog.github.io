@@ -95,137 +95,128 @@ if (post.data.isRecipe && post.data.recipeIngredients && post.data.recipeInstruc
   description={post.data.description}
   ogImage={post.data.heroImage} >
 
-    {post.data.draft ? (
-        // 模式 A: 草稿預覽 (只顯示提示)
-        <div class="max-w-3xl mx-auto my-12 p-8 bg-yellow-100 border border-yellow-400 rounded-lg">
-            <h1 class="text-2xl text-red-600">⚠ 草稿模式預覽 ⚠</h1>
-            <p class="mt-4 text-gray-700">這篇文章被標記為草稿 (draft: true)，並不會公開顯示在列表頁面中。只有知道連結的人才能看到此預覽。</p>
-        </div>
-    ) : (
-        // 模式 B: 公開文章 (顯示完整內容)
-        <>
-        <div class="max-w-3xl mx-auto">
+        <div class="max-w-3xl mx-auto">
 
-            <nav class="text-sm text-[var(--text-secondary)] mb-4">
-                <a href="/archive" class="hover:text-[var(--accent-color)]">所有文章</a>
-                <span class="mx-2">&gt;</span>
-                <a href={`/category/${post.data.category[0]}`} class="hover:text-[var(--accent-color)]">
-                    {post.data.category[0]}
-                </a>
-            </nav>
+        <nav class="text-sm text-[var(--text-secondary)] mb-4">
+            <a href="/archive" class="hover:text-[var(--accent-color)]">所有文章</a>
+            <span class="mx-2">&gt;</span>
+            <a href={`/category/${post.data.category[0]}`} class="hover:text-[var(--accent-color)]">
+                {post.data.category[0]}
+            </a>
+        </nav>
 
-            <article class="bg-[var(--bg-card)] rounded-xl shadow-lg p-8 md:p-12">
+        <article class="bg-[var(--bg-card)] rounded-xl shadow-lg p-8 md:p-12">
 
-                <header class="mb-8">
-                    <div class="mb-4 flex flex-wrap gap-2">
-                        {post.data.category.map(cat => (
-                            <a
-                              href={`/category/${cat}`}
-                              class="text-sm font-medium text-white bg-[var(--accent-color)] py-1 px-3 rounded-full hover:bg-[var(--accent-hover)] transition-colors"
-                            >
-                              {cat}
-                            </a>
-                        ))}
-                    </div>
+            <header class="mb-8">
+                <div class="mb-4 flex flex-wrap gap-2">
+                    {post.data.category.map(cat => (
+                        <a
+                          href={`/category/${cat}`}
+                          class="text-sm font-medium text-white bg-[var(--accent-color)] py-1 px-3 rounded-full hover:bg-[var(--accent-hover)] transition-colors"
+                        >
+                          {cat}
+                        </a>
+                    ))}
+                    </div>
 
-                    <h1 class="text-3xl md:text-4xl font-bold text-[var(--text-primary)] leading-tight mb-4 whitespace-pre-line">
-                        {post.data.title}
-                    </h1>
+                    <h1 class="text-3xl md:text-4xl font-bold text-[var(--text-primary)] leading-tight mb-4 whitespace-pre-line">
+                        {post.data.title}
+                    </h1>
 
-                    <span class="text-base text-gray-500">
-                        {new Date(post.data.publishDate).toLocaleDateString('zh-TW')}・由 かえ (KAE) 撰寫
-                    </span>
-                </header>
+                    <span class="text-base text-gray-500">
+                        {new Date(post.data.publishDate).toLocaleDateString('zh-TW')}・由 かえ (KAE) 撰寫
+                    </span>
+                </header>
 
-                {headings.filter(h => h.depth === 2 || h.depth === 3).length > 0 && (
-                    <div class="bg-gray-100 p-6 rounded-lg mb-8 border border-[var(--border-color)]">
-                        <h2 class="text-xl font-bold text-[var(--text-primary)] mb-4">文章目次</h2>
-                        <ul class="space-y-2">
-                            {headings
-                              .filter(h => h.depth === 2 || h.depth === 3)
-                              .map(heading => (
-                                <li class={heading.depth === 3 ? 'ml-4' : ''}>
-                                  <a
-                                    href={`#${heading.slug}`}
-                                    class="text-[var(--text-secondary)] hover:text-[var(--accent-color)] transition-colors"
-                                  >
-                                    {heading.text}
-                                  </a>
-                                </li>
-                              ))}
-                        </ul>
-                    </div>
-                )}
+                {headings.filter(h => h.depth === 2 || h.depth === 3).length > 0 && (
+                    <div class="bg-gray-100 p-6 rounded-lg mb-8 border border-[var(--border-color)]">
+                        <h2 class="text-xl font-bold text-[var(--text-primary)] mb-4">文章目次</h2>
+                        <ul class="space-y-2">
+                            {headings
+                              .filter(h => h.depth === 2 || h.depth === 3)
+                              .map(heading => (
+                                <li class={heading.depth === 3 ? 'ml-4' : ''}>
+                                  <a
+                                    href={`#${heading.slug}`}
+                                    class="text-[var(--text-secondary)] hover:text-[var(--accent-color)] transition-colors"
+                                  >
+                                    {heading.text}
+                                  </a>
+                                </li>
+                              ))}
+                        </ul>
+                    </div>
+                )}
 
-                <div class="prose max-w-none">
-                    <Content />
-                </div>
+                <div class="prose max-w-none">
+                    <Content />
+                </div>
 
-                <footer class="mt-8 pt-6 border-t border-[var(--border-color)]">
-                    
-                    {post.data.tags && post.data.tags.length > 0 && (
-                        <div class="flex flex-wrap items-center gap-2">
-                            <span class="text-sm font-semibold text-[var(--text-secondary)]">Tags:</span>
-                            {post.data.tags.map(tag => (
-                              <span class="px-2 py-0.5 rounded-md text-gray-700 text-xs" style="background-color: #e7f0e2;">
-                                {tag}
-                              </span>
-                            ))}
-                        </div>
-                    )}
+                <footer class="mt-8 pt-6 border-t border-[var(--border-color)]">
+                    
+                    {post.data.tags && post.data.tags.length > 0 && (
+                        <div class="flex flex-wrap items-center gap-2">
+                            <span class="text-sm font-semibold text-[var(--text-secondary)]">Tags:</span>
+                            {post.data.tags.map(tag => (
+                              <span class="px-2 py-0.5 rounded-md text-gray-700 text-xs" style="background-color: #e7f0e2;">
+                                {tag}
+                              </span>
+                            ))}
+                        </div>
+                    )}
 
-                    <div class={`flex flex-wrap gap-2 ${post.data.tags && post.data.tags.length > 0 ? 'mt-8' : ''}`}>
-                        
-                        <button 
-                          id="copy-link-btn" 
-                          class="text-sm font-medium text-white bg-[var(--accent-color)] py-1.5 px-3 rounded-full hover:bg-[var(--accent-hover)] transition-colors"
-                        >
-                          複製連結
-                        </button>
+                    <div class={`flex flex-wrap gap-2 ${post.data.tags && post.data.tags.length > 0 ? 'mt-8' : ''}`}>
+                        
+                        <button 
+                          id="copy-link-btn" 
+                          class="text-sm font-medium text-white bg-[var(--accent-color)] py-1.5 px-3 rounded-full hover:bg-[var(--accent-hover)] transition-colors"
+                        >
+                          複製連結
+                        </button>
 
-                        <button 
-                          id="native-share-btn" 
-                          class="hidden text-sm font-medium text-white bg-[var(--accent-color)] py-1.5 px-3 rounded-full hover:bg-[var(--accent-hover)] transition-colors"
-                        >
-                          分享此文
-                        </button>
-                    </div>
-                </footer>
-            </article>
+                        <button 
+                          id="native-share-btn" 
+                          class="hidden text-sm font-medium text-white bg-[var(--accent-color)] py-1.5 px-3 rounded-full hover:bg-[var(--accent-hover)] transition-colors"
+                        >
+                          分享此文
+                        </button>
+                    </div>
+                </footer>
+            </article>
 
-            <nav class="mt-8 grid grid-cols-1 gap-4">
-                {prevPost && (
-                    <a
-                      href={`/blog/${prevPost.slug}`}
-                      class="block bg-[var(--bg-card)] p-4 rounded-lg shadow-md hover:shadow-lg transition-all text-left"
-                    >
-                      <span class="text-sm text-gray-500">&larr; 上一篇文章</span>
-                      <span class="block text-base font-semibold text-[var(--accent-color)] mt-1">
-                        {prevPost.title}
-                      </span>
-                    </a>
-                  )}
-                  {nextPost && (
-                    <a
-                      href={`/blog/${nextPost.slug}`}
-                      class="block bg-[var(--bg-card)] p-4 rounded-lg shadow-md hover:shadow-lg transition-all text-left"
-                    >
-                      <span class="text-sm text-gray-500">下一篇文章 &rarr;</span>
-                      <span class="block text-base font-semibold text-[var(--accent-color)] mt-1">
-                        {nextPost.title}
-                      </span>
-                    </a>
-                  )}
-            </nav>
+            <nav class="mt-8 grid grid-cols-1 gap-4">
+                {prevPost && (
+                    <a
+                      href={`/blog/${prevPost.slug}`}
+                      class="block bg-[var(--bg-card)] p-4 rounded-lg shadow-md hover:shadow-lg transition-all text-left"
+                    >
+                      <span class="text-sm text-gray-500">&larr; 上一篇文章</span>
+                      <span class="block text-base font-semibold text-[var(--accent-color)] mt-1">
+                        {prevPost.title}
+                      </span>
+                    </a>
+                  )}
+                  {nextPost && (
+                    <a
+                      href={`/blog/${nextPost.slug}`}
+                      class="block bg-[var(--bg-card)] p-4 rounded-lg shadow-md hover:shadow-lg transition-all text-left"
+                    >
+                      <span class="text-sm text-gray-500">下一篇文章 &rarr;</span>
+                      <span class="block text-base font-semibold text-[var(--accent-color)] mt-1">
+                        {nextPost.title}
+                      </span>
+                    </a>
+                  )}
+            </nav>
 
-        </div>
-        </>
-    )}
-    <script type="application/ld+json" set:html={JSON.stringify(blogPostingSchema)} />
-    {recipeSchema && (
-      <script type="application/ld+json" set:html={JSON.stringify(recipeSchema)} />
-    )}
-    <script>
-      // ... (setupShareButtons 函式保持不變) ...
-    </script>
+        </div>
+        </>
+    )}
+    <script type="application/ld+json" set:html={JSON.stringify(blogPostingSchema)} />
+    {recipeSchema && (
+      <script type="application/ld+json" set:html={JSON.stringify(recipeSchema)} />
+    )}
+    <script>
+      // ... (setupShareButtons 函式保持不變) ...
+    </script>
 </BaseLayout>
