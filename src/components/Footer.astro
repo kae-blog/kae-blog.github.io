@@ -9,28 +9,21 @@ const formattedFooterBio = author.footerBio.replaceAll('\n', '<br />');
         
     <div class="container mx-auto px-6 py-10">
         <div class="max-w-3xl mx-auto">
-            <!-- 
-              👇 修改重點：
-              1. justify-center: 讓內容整體置中
-              2. flex-col md:flex-row: 手機版垂直堆疊，電腦版水平並排
-              3. gap-6: 使用 gap 來控制圖片與文字的距離 (取代原本的 ml-4)
-              4. p-8: 增加一點內距，讓卡片看起來更大方
-            -->
             <div class="bg-[var(--bg-card)] rounded-xl shadow-md flex flex-col md:flex-row items-center justify-center p-8 gap-6">
                 
                 <!-- 頭像區 -->
                 <div class="flex-shrink-0">
-                    <!-- 我稍微加大了頭像 (w-20)，讓置中版面更平衡 -->
                     <img src={author.avatar} alt={author.name} class="w-20 h-20 rounded-full object-cover border-2 border-white shadow-sm">
                 </div>
 
                 <!-- 
                    文字區 
-                   1. 移除 flex-1 (關鍵！這樣才不會被拉伸到最左邊)
-                   2. text-left md:text-left (手機置中，電腦靠左)
-                   3. max-w-lg (限制文字最大寬度，避免太長時閱讀困難)
+                   1. text-justify: 手機版左右對齊 (讓文字兩邊切齊)
+                   2. md:text-left: 電腦版靠左對齊
+                   3. w-full: 確保區塊寬度足夠，讓對齊效果正常顯示
                 -->
-                <div class="text-center md:text-left max-w-lg">
+                <div class="text-justify md:text-left max-w-lg w-full">
+                    <!-- 標題 (因為是短行，左右對齊視覺上會像靠左，這是正常的) -->
                     <h4 class="text-base font-bold text-[var(--text-primary)] mb-2">作者簡介</h4>
                     
                     <p 
