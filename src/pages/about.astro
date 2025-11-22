@@ -1,5 +1,5 @@
 ---
-// src/pages/about.astro
+// src/pages/about.astro (已修正：整合式卡片設計)
 import BaseLayout from '../layouts/BaseLayout.astro';
 import author from '../data/author.json';
 
@@ -14,41 +14,46 @@ const formattedBio = author.fullBio.replaceAll('\n', '<br />');
   <div class="max-w-3xl mx-auto">
     
     <!-- 
-      1. 上方區塊：個人簡介 Header (無邊框背景)
-      頭像在左，文字在右
-    -->
-    <div class="flex flex-col md:flex-row items-center md:items-end gap-6 mb-8 px-4">
-      <!-- 頭像 -->
-      <img 
-        src={author.avatar} 
-        alt={`${author.name} 的大頭照`}
-        class="w-32 h-32 md:w-40 md:h-40 rounded-full object-cover border-4 border-white shadow-md flex-shrink-0"
-      >
-      
-      <!-- 名字與 Tagline -->
-      <div class="text-center md:text-left pb-2">
-        <h1 class="text-4xl font-bold text-[var(--text-primary)] mb-2">
-          {author.name}
-        </h1>
-        <p class="text-lg text-[var(--text-secondary)] font-medium">
-          {author.tagline}
-        </p>
-      </div>
-    </div>
-
-    <!-- 
-      2. 下方區塊：詳細介紹 (卡片樣式)
-      內文左右對齊 (text-justify)
+      單一白色卡片容器 (統一包住 Header 和 Content)
+      p-8 md:p-12: 增加內距，讓內容不會太靠邊 (解決太偏左的問題)
     -->
     <article class="bg-[var(--bg-card)] rounded-xl shadow-lg p-8 md:p-12">
+
+      <!-- 
+        1. 上方 Header 區塊
+        items-center: 讓頭像與右邊的文字區塊「垂直置中」對齊
+        border-b: 加一條底線區隔，讓視覺更清晰
+      -->
+      <div class="flex flex-col md:flex-row items-center gap-8 mb-8 border-b border-[var(--border-color)] pb-8">
+        
+        <!-- 頭像 -->
+        <img 
+          src={author.avatar} 
+          alt={`${author.name} 的大頭照`}
+          class="w-32 h-32 md:w-40 md:h-40 rounded-full object-cover border-4 border-white shadow-sm flex-shrink-0"
+        >
+        
+        <!-- 名字與 Tagline -->
+        <div class="text-center md:text-left">
+          <h1 class="text-4xl font-bold text-[var(--text-primary)] mb-3">
+            {author.name}
+          </h1>
+          <p class="text-lg text-[var(--text-secondary)] font-medium">
+            {author.tagline}
+          </p>
+        </div>
+      </div>
+
+      <!-- 
+        2. 下方內文區塊
+      -->
       <div class="prose max-w-none">
-        <!-- text-justify: 讓內文左右對齊 -->
-        <!-- space-y-4: 讓段落間自動有間距 -->
         <div 
           class="text-xl leading-relaxed space-y-4 text-justify" 
           set:html={formattedBio} 
         />
       </div>
+
     </article>
 
   </div>
