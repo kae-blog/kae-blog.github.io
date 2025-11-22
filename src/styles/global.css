@@ -1,6 +1,16 @@
+/* 1. 在這裡引入 Google Fonts (Zen Maru Gothic) */
+@import url('https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* 2. 新增自訂字體 class (放在 layer utilities 讓 Tailwind 能讀取) */
+@layer utilities {
+  .font-zen {
+    font-family: 'Zen Maru Gothic', sans-serif;
+  }
+}
 
 /* 你的自訂 CSS */
 :root {
