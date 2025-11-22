@@ -28,7 +28,7 @@ heroImage: '/images/2511/blog_keiken_hero.png'
 # (7) 標籤
 # 用途：卡片日期旁的輔助標籤、文章頁文末的標籤雲
 # 格式：[ ] 陣列。如果不需要，可以整行刪除
-tags: ['部落格', '自架站', 'GitHub Pages', 'Astro', '前端開發', '網站架設', 'SEO', '踩坑筆記', '個人品牌', '技術分享', 'AI工具']
+tags: ['自架站', '部落格', 'GitHub Pages', 'Astro', '前端開發', '網站架設', 'SEO', '踩坑筆記', '個人品牌', '技術分享', 'AI工具']
 # (8) 自訂網址名稱
 slug: blogkeiken
 ---
