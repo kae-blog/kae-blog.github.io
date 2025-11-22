@@ -18,7 +18,14 @@ const formattedFooterBio = author.footerBio.replaceAll('\n', '<br />');
                 <img src={author.avatar} alt={author.name} class="w-16 h-16 rounded-full">
             </div>
             <div class="ml-4 flex-1">
-                <h4 class="text-base font-bold text-[var(--text-primary)]">{author.name}</h4>
+                
+                <!-- 
+                   👇 修改這裡：
+                   原本是 {author.name} (會顯示 KAE)
+                   改成直接寫死文字 "作者簡介"
+                -->
+                <h4 class="text-base font-bold text-[var(--text-primary)]">作者簡介</h4>
+                
                 <p 
                   class="text-sm text-[var(--text-secondary)]"
                   set:html={formattedFooterBio}
