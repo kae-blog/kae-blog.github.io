@@ -3,7 +3,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import author from '../data/author.json';
 
-// 處理 \n 換行符號，將它們轉換為 <br>
+// 處理 \n 換行符號
 const formattedBio = author.fullBio.replaceAll('\n', '<br />');
 ---
 <BaseLayout
@@ -11,22 +11,46 @@ const formattedBio = author.fullBio.replaceAll('\n', '<br />');
   description={author.footerBio}
 >
 
-<article class="max-w-3xl mx-auto bg-[var(--bg-card)] rounded-xl shadow-lg p-8 md:p-12">        
-        <div class="flex flex-col md:flex-row items-center">
-<img 
-  src={author.avatar} 
-  alt={`${author.name} 的大頭照`}
-  class="w-40 h-40 md:w-48 md:h-48 mb-6 md:mb-0 md:mr-10 flex-shrink-0 rounded-full"
->
-            
-                        <div class="w-full text-left">
-                              <h2 class="text-3xl md:text-4xl font-bold text-[var(--text-primary)] mb-4"> {author.name}</h2>
-                <div class="prose max-w-none">
-<div class="text-xl leading-relaxed space-y-4" set:html={formattedBio} />
-</div>
-            </div>
-        </div>
+  <div class="max-w-3xl mx-auto">
+    
+    <!-- 
+      1. 上方區塊：個人簡介 Header (無邊框背景)
+      頭像在左，文字在右
+    -->
+    <div class="flex flex-col md:flex-row items-center md:items-end gap-6 mb-8 px-4">
+      <!-- 頭像 -->
+      <img 
+        src={author.avatar} 
+        alt={`${author.name} 的大頭照`}
+        class="w-32 h-32 md:w-40 md:h-40 rounded-full object-cover border-4 border-white shadow-md flex-shrink-0"
+      >
+      
+      <!-- 名字與 Tagline -->
+      <div class="text-center md:text-left pb-2">
+        <h1 class="text-4xl font-bold text-[var(--text-primary)] mb-2">
+          {author.name}
+        </h1>
+        <p class="text-lg text-[var(--text-secondary)] font-medium">
+          {author.tagline}
+        </p>
+      </div>
+    </div>
 
-    </article>
+    <!-- 
+      2. 下方區塊：詳細介紹 (卡片樣式)
+      內文左右對齊 (text-justify)
+    -->
+    <article class="bg-[var(--bg-card)] rounded-xl shadow-lg p-8 md:p-12">
+      <div class="prose max-w-none">
+        <!-- text-justify: 讓內文左右對齊 -->
+        <!-- space-y-4: 讓段落間自動有間距 -->
+        <div 
+          class="text-xl leading-relaxed space-y-4 text-justify" 
+          set:html={formattedBio} 
+        />
+      </div>
+    </article>
+
+  </div>
 
 </BaseLayout>
