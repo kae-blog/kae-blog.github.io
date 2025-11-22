@@ -1,5 +1,5 @@
 ---
-// src/pages/about.astro (已修正：整合式卡片設計)
+// src/pages/about.astro (已修正：移除內文分隔線 + Header 置中)
 import BaseLayout from '../layouts/BaseLayout.astro';
 import author from '../data/author.json';
 
@@ -13,18 +13,15 @@ const formattedBio = author.fullBio.replaceAll('\n', '<br />');
 
   <div class="max-w-3xl mx-auto">
     
-    <!-- 
-      單一白色卡片容器 (統一包住 Header 和 Content)
-      p-8 md:p-12: 增加內距，讓內容不會太靠邊 (解決太偏左的問題)
-    -->
     <article class="bg-[var(--bg-card)] rounded-xl shadow-lg p-8 md:p-12">
 
       <!-- 
         1. 上方 Header 區塊
-        items-center: 讓頭像與右邊的文字區塊「垂直置中」對齊
-        border-b: 加一條底線區隔，讓視覺更清晰
+        items-center: 垂直置中
+        justify-center: 【新增】水平置中 (解決太靠左的問題)
+        border-b: 保留這條唯一的底線 (Header 與內文的區隔)
       -->
-      <div class="flex flex-col md:flex-row items-center gap-8 mb-8 border-b border-[var(--border-color)] pb-8">
+      <div class="flex flex-col md:flex-row items-center justify-center gap-8 mb-8 border-b border-[var(--border-color)] pb-8">
         
         <!-- 頭像 -->
         <img 
@@ -46,8 +43,9 @@ const formattedBio = author.fullBio.replaceAll('\n', '<br />');
 
       <!-- 
         2. 下方內文區塊
+        加入 class="about-content" 以便下方 CSS 針對性調整
       -->
-      <div class="prose max-w-none">
+      <div class="prose max-w-none about-content">
         <div 
           class="text-xl leading-relaxed space-y-4 text-justify" 
           set:html={formattedBio} 
@@ -57,5 +55,19 @@ const formattedBio = author.fullBio.replaceAll('\n', '<br />');
     </article>
 
   </div>
+
+  <!-- 
+    CSS 覆寫區塊 
+    專門針對 .about-content 裡的標題移除底線
+  -->
+  <style is:global>
+    .about-content h2,
+    .about-content h3 {
+      border-bottom: none !important; /* 強制移除底線 */
+      padding-bottom: 0 !important;
+      margin-top: 2rem !important;    /* 保持上方間距，讓段落分明 */
+      margin-bottom: 1rem !important; /* 保持下方間距 */
+    }
+  </style>
 
 </BaseLayout>
