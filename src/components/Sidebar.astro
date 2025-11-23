@@ -1,5 +1,5 @@
 ---
-// 檔案路徑: src/components/Sidebar.astro (修改)
+// 檔案路徑: src/components/Sidebar.astro (已將標題改為連結)
 import { getCollection } from 'astro:content';
 import author from '../data/author.json';
 const allPosts = (await getCollection('blog')).filter(post => !post.data.draft);
@@ -14,11 +14,20 @@ allPosts.flatMap(post => post.data.category).forEach(cat => {
 ---
 <aside class="md:col-span-1 space-y-8">
     
-   
     <div class="bg-[var(--bg-card)] p-6 rounded-xl shadow-lg">
-        <h3 class="text-xl font-bold text-[var(--text-primary)] mb-4">文章分類</h3>
-        <ul class="space-y-2">
+        
+        <!-- 
+           👇 修正：將 H3 標籤替換成連結，並加上樣式
+           點擊後會連結到 /archive (所有文章)
+        -->
+        <a href="/archive" class="text-xl font-bold text-[var(--text-primary)] mb-4 hover:text-[var(--accent-color)] transition-colors flex items-center justify-between">
+            文章分類 
+            <span class="text-sm text-[var(--text-secondary)] hover:text-[var(--accent-color)]">&rarr;</span>
+        </a>
+        
+        <ul class="space-y-2 mt-4"> <!-- 加上 mt-4 讓列表與標題有足夠間距 -->
             <li>
+                <!-- 保持所有文章連結 (現在是次級連結) -->
                 <a href="/archive" class="block text-[var(--text-secondary)] hover:text-[var(--accent-color)] transition-colors">
                     所有文章 ({totalCount})
                 </a>
