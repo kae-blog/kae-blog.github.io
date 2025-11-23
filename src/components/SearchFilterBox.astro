@@ -1,0 +1,122 @@
+---
+// 檔案路徑: src/components/SearchFilterBox.astro
+// 這是所有文章和分類頁面使用的「搜尋與分類導覽」模組
+import { getCollection } from 'astro:content';
+
+interface Props {
+  // 用來判斷當前頁面是否為某個分類頁 (例如: "甜點食譜")
+  // 如果是，該分類的按鈕會被高亮
+  currentCategory?: string; 
+}
+
+const { currentCategory } = Astro.props;
+
+// 抓取所有文章（已過濾草稿）
+const allPosts = (await getCollection('blog')).filter(post => !post.data.draft);
+// 取得所有唯一的分類
+const allCategories = allPosts.flatMap(post => post.data.category);
+const uniqueCategories = [...new Set(allCategories)].filter(Boolean);
+---
+
+<div class="mb-8 p-4 bg-[var(--bg-card)] rounded-lg shadow-md space-y-4">
+  
+  <!-- 1. 分類導覽區塊 -->
+  <div class="space-y-3 border-b border-[var(--border-color)] pb-4">
+    <h3 class="text-lg font-bold text-[var(--text-primary)]">瀏覽所有分類</h3>
+    <div class="flex flex-wrap gap-2">
+      
+      <!-- 所有文章按鈕 -->
+      <a href="/archive" class="text-xs font-medium text-white py-1 px-3 rounded-full transition-colors flex-shrink-0"
+         class:list={[
+           currentCategory === '所有文章' && 'bg-[var(--accent-color)] hover:bg-[var(--accent-hover)]',
+           currentCategory !== '所有文章' && 'bg-gray-400 hover:bg-gray-500'
+         ]}
+      >
+        所有文章
+      </a>
+      
+      <!-- 各個分類連結 -->
+      {uniqueCategories.map(cat => (
+        <a 
+          href={`/category/${cat}`} 
+          class="text-xs font-medium py-1 px-3 rounded-full transition-colors flex-shrink-0"
+          class:list={[
+            cat === currentCategory && 'bg-[var(--accent-color)] text-white hover:bg-[var(--accent-hover)]',
+            cat !== currentCategory && 'bg-gray-100 text-[var(--text-secondary)] hover:bg-gray-200'
+          ]}
+        >
+          {cat}
+        </a>
+      ))}
+    </div>
+  </div>
+
+  <!-- 2. 搜尋輸入框 -->
+  <div class="pt-2">
+    <input 
+      type="search" 
+      id="search-input" 
+      placeholder="在此頁面中搜尋..."
+      class="w-full px-3 py-2 rounded-md border border-[var(--border-color)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--accent-color)]"
+    >
+  </div>
+
+</div>
+
+<!-- 
+  👇 搜尋篩選 JavaScript 
+  注意：這個腳本只負責執行頁面內的「篩選」，不處理點擊分類標籤後的「跳轉」行為。
+-->
+<script>
+  document.addEventListener('astro:page-load', () => {
+    const searchInput = document.getElementById('search-input');
+    const articleListContainer = document.getElementById('article-list-container');
+    const articleWrappers = articleListContainer?.querySelectorAll('.article-card-wrapper');
+    const noResultsMessage = document.getElementById('no-results-message');
+
+    if (!searchInput || !articleWrappers || !noResultsMessage) return;
+
+    let currentSearch = '';
+    
+    // 讀取 URL 參數 (來自頁首的搜尋)
+    const urlParams = new URLSearchParams(window.location.search);
+    const queryFromUrl = urlParams.get('q');
+
+    // 初始化：如果 URL 有搜尋關鍵字，則填入並執行篩選
+    if (queryFromUrl) {
+      (searchInput as HTMLInputElement).value = queryFromUrl;
+      currentSearch = queryFromUrl.toLowerCase().trim();
+    }
+
+    function runSearchFilter() {
+      let visibleCount = 0;
+      const searchTerm = currentSearch; 
+
+      articleWrappers.forEach(wrapper => {
+        const el = wrapper as HTMLElement;
+        const searchText = el.dataset.searchText || '';
+        
+        // 條件: 搜尋文字
+        const matchesSearch = searchTerm === '' || searchText.includes(searchTerm);
+
+        if (matchesSearch) {
+          el.style.display = 'block'; 
+          visibleCount++;
+        } else {
+          el.style.display = 'none';
+        }
+      });
+
+      noResultsMessage.style.display = visibleCount === 0 ? 'block' : 'none';
+    }
+
+    // 監聽搜尋框輸入
+    searchInput.addEventListener('input', (e) => {
+      currentSearch = (e.target as HTMLInputElement).value.toLowerCase().trim();
+      runSearchFilter();
+    });
+
+    // 頁面載入時，立即執行一次篩選
+    runSearchFilter();
+  });
+</script>
