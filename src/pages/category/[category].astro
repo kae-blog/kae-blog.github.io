@@ -1,7 +1,9 @@
 ---
-// 檔案路徑: src/pages/category/[category].astro (已整合搜尋功能)
+// 檔案路徑: src/pages/category/[category].astro
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Sidebar from '../../components/Sidebar.astro';
+// 👇 1. 引入方形卡片元件
+import PostCard from '../../components/PostCard.astro';
 import { getCollection } from 'astro:content';
 
 // (這是你 index.astro 裡的函式，我們複製過來用)
@@ -12,13 +14,13 @@ const formatDate = (date: Date) => {
 
 // 1. 告訴 Astro 要產生哪些頁面
 export async function getStaticPaths() {
-  const allPosts = (await getCollection('blog')).sort( // ✅ 修正：移除 .filter()，讓所有網址都被建置
-    (a, b) => new Date(a.data.publishDate).getTime() - new Date(b.data.publishDate).getTime()
-  );
+  const allPosts = (await getCollection('blog')).sort(
+    (a, b) => new Date(a.data.publishDate).getTime() - new Date(b.data.publishDate).getTime()
+  );
 
   // 找出所有不重複的分類
   const allCategories = allPosts.flatMap(post => post.data.category);
-  const uniqueCategories = [...new Set(allCategories)]; // Set 會自動過濾重複
+  const uniqueCategories = [...new Set(allCategories)]; 
   
   // 為每一個分類都產生一個頁面
   return uniqueCategories.map(cat => ({
@@ -30,8 +32,9 @@ export async function getStaticPaths() {
 const { category } = Astro.params;
 
 // 3. 取得「所有」文章 (用於篩選器) 和「已過濾」文章
+// (這裡有過濾 draft，所以列表不會顯示草稿)
 const allPosts = (await getCollection('blog'))
-  .filter(post => !post.data.draft); // 👈 修正：先過濾掉草稿
+  .filter(post => !post.data.draft); 
 
 const filteredPosts = allPosts
   .filter(post => post.data.category.includes(category))
@@ -39,9 +42,9 @@ const filteredPosts = allPosts
     (a, b) => new Date(b.data.publishDate).getTime() - new Date(a.data.publishDate).getTime()
   );
 
-// --- 4. (新加入) 取得所有分類，為了產生篩選按鈕 ---
+// 4. 取得所有分類，為了產生篩選按鈕
 const allCategories = allPosts.flatMap(post => post.data.category);
-const uniqueCategories = [...new Set(allCategories)].filter(Boolean); // .filter(Boolean) 是為了移除可能的空值
+const uniqueCategories = [...new Set(allCategories)].filter(Boolean);
 
 const pageTitle = `分類：${category}`;
 ---
@@ -49,10 +52,11 @@ const pageTitle = `分類：${category}`;
   <div class="grid grid-cols-1 md:grid-cols-3 gap-10 lg:gap-12">
     <div class="md:col-span-2 space-y-12">
       <section>
-<h2 class="text-2xl font-bold text-[var(--text-primary)] mb-6 pb-3 border-b border-[var(--border-color)]">
-    分類：{category} ({filteredPosts.length})
-</h2>
+        <h2 class="text-2xl font-bold text-[var(--text-primary)] mb-6 pb-3 border-b border-[var(--border-color)]">
+            分類：{category} ({filteredPosts.length})
+        </h2>
 
+        <!-- 搜尋/篩選器區塊 (保持不變) -->
         <div class="mb-8 p-4 bg-[var(--bg-card)] rounded-lg shadow-md">
           <div class="mb-4">
             <input type="search" id="search-input" placeholder="在此頁面中搜尋..." class="w-full px-3 py-2 rounded-md border border-[var(--border-color)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--accent-color)]">
@@ -69,66 +73,48 @@ const pageTitle = `分類：${category}`;
             ))}
           </div>
         </div>
-
+        
         <div id="no-results-message" class="hidden text-center text-gray-500 py-10">
           <p>找不到符合條件的文章 😅</p>
         </div>
-        <div class="space-y-4" id="article-list-container">
+
+        <!-- 
+           👇 修改重點：文章列表容器
+           1. 使用 grid grid-cols-1 md:grid-cols-2 (電腦版雙欄)
+           2. 使用 <PostCard /> 取代原本的 HTML
+           3. 外層加上 wrapper 供搜尋 script 控制顯示/隱藏
+        -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="article-list-container">
           {filteredPosts.map(post => (
-            <article 
-              class="article-card bg-[var(--bg-card)] rounded-xl shadow-md flex items-center p-4 hover:shadow-lg transition-all duration-300"
-              data-search-text={`${post.data.title} ${post.data.description} ${post.data.category.join(' ')} ${post.data.tags?.join(' ')}`}
+            <div 
+              class="article-card-wrapper"
+              data-search-text={[
+                post.data.title,
+                post.data.description,
+                ...post.data.category,
+                ...(post.data.tags || [])
+              ].join(' ').toLowerCase()}
               data-category={post.data.category.join(' ')}
             >
-              <div class="w-24 h-24 flex-shrink-0 overflow-hidden border border-[var(--border-color)] mr-4 rounded-lg">
-                <img src={post.data.previewImage} alt={post.data.title} class="w-full h-full object-cover" />
-              </div>
-              <div class="flex-1 flex flex-col">
-                <div class="mb-2 flex flex-wrap gap-1 justify-end">
-                  {post.data.category.map(cat => (
-                    <a href={`/category/${cat}`} class="text-xs font-medium text-white bg-[var(--accent-color)] py-1 px-2 rounded-full hover:bg-[var(--accent-hover)] transition-colors">
-                      {cat}
-                    </a>
-                  ))}
-                </div>
-<div class="flex-grow">
-    <h3 class="text-base font-bold text-[var(--text-primary)] mb-1 line-clamp-2">
-      <a href={`/blog/${post.slug}`} class="hover:text-[var(--accent-color)] transition-colors">
-        {post.data.title}
-      </a>
-    </h3>
-    <p class="text-sm text-[var(--text-secondary)] line-clamp-2 mb-2">{post.data.description}</p>
-</div>
-                <div class="flex flex-wrap items-center justify-between text-xs text-gray-500 gap-x-2 gap-y-1">
-                  <div class="flex flex-wrap items-center gap-x-2 gap-y-1">
-                    <span>{formatDate(post.data.publishDate)}</span>
-                    {post.data.tags?.slice(0, 3).map(tag => (
-                      <span class="px-2 py-0.5 rounded-md text-white text-xs" style="background-color: var(--accent-color);">
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                  <a href={`/blog/${post.slug}`} class="text-[var(--accent-color)] hover:underline ml-auto">閱讀 &rarr;</a>
-                </div>
-              </div>
-            </article>
+              <PostCard post={post} />
+            </div>
           ))}
         </div>
-        </section>
+
+      </section>
     </div>
     <Sidebar />
   </div>
-</BaseLayout>
 
 
 <script>
   // 讓 <head> 中的 ViewTransitions API 知道這個頁面有動態內容
   document.addEventListener('astro:page-load', () => {
     
-    const searchInput = document.getElementById('search-input') as HTMLInputElement;
+    const searchInput = document.getElementById('search-input');
     const articleListContainer = document.getElementById('article-list-container');
-    // 我們只抓取這個容器內的 article-card，避免選到側邊欄的
-    const articles = articleListContainer?.querySelectorAll('.article-card') || [];
+    // 👇 修改：選擇器改抓 .article-card-wrapper (因為 PostCard 被包在裡面)
+    const articleWrappers = articleListContainer?.querySelectorAll('.article-card-wrapper');
     const noResultsMessage = document.getElementById('no-results-message');
     const categoryButtons = document.querySelectorAll('.category-filter-btn');
 
@@ -136,9 +122,7 @@ const pageTitle = `分類：${category}`;
     // 邏輯：檢查當前 URL，自動點擊對應的分類按鈕
     // ----- 
     try {
-      // 1. 從 URL 獲取當前分類名稱 (例如 /category/日本留學 -> 日本留學)
-      // 我們用 Astro.params.category 的值，因為它已經解碼了
-      const currentCategory = (document.querySelector('h2.text-3xl') as HTMLElement)?.innerText.split('分類：')[1].split(' (')[0].trim();
+      const currentCategory = (document.querySelector('h2.text-2xl') as HTMLElement)?.innerText.split('分類：')[1].split(' (')[0].trim();
 
       if (currentCategory && currentCategory !== "undefined") {
         // 2. 移除 "全部" 按鈕的 active 狀態
@@ -155,7 +139,6 @@ const pageTitle = `分類：${category}`;
       }
     } catch (e) {
       console.error('Error auto-selecting category:', e);
-      // 如果出錯，就保持 "全部" 為 active
     }
 
 
@@ -163,7 +146,7 @@ const pageTitle = `分類：${category}`;
     // 篩選主函式
     // ----- 
     function filterArticles() {
-      const searchTerm = searchInput.value.toLowerCase().trim();
+      const searchTerm = (searchInput as HTMLInputElement).value.toLowerCase().trim();
       
       // 找到當前 "active" 的分類按鈕
       const activeCategoryBtn = document.querySelector('.category-filter-btn.active');
@@ -171,24 +154,26 @@ const pageTitle = `分類：${category}`;
 
       let hasVisibleArticles = false;
 
-      articles.forEach(article => {
-        const card = article as HTMLElement;
-        const searchText = card.dataset.searchText?.toLowerCase() || '';
-        const categories = card.dataset.category?.split(' ') || [];
-        
-        // 條件1: 搜尋文字
-        const matchesSearch = searchTerm === '' || searchText.includes(searchTerm);
-        
-        // 條件2: 分類
-        const matchesCategory = activeCategory === 'all' || categories.includes(activeCategory);
+      if (articleWrappers) {
+        articleWrappers.forEach(wrapper => {
+          const el = wrapper as HTMLElement;
+          const searchText = el.dataset.searchText || '';
+          const categories = el.dataset.category || '';
+          
+          // 條件1: 搜尋文字
+          const matchesSearch = searchTerm === '' || searchText.includes(searchTerm);
+          
+          // 條件2: 分類
+          const matchesCategory = activeCategory === 'all' || categories.includes(activeCategory);
 
-        if (matchesSearch && matchesCategory) {
-          card.style.display = 'flex'; // (您的卡片是用 flex 佈局)
-          hasVisibleArticles = true;
-        } else {
-          card.style.display = 'none';
-        }
-      });
+          if (matchesSearch && matchesCategory) {
+            el.style.display = 'block'; // 顯示
+            hasVisibleArticles = true;
+          } else {
+            el.style.display = 'none'; // 隱藏
+          }
+        });
+      }
 
       // 顯示/隱藏 "無結果" 訊息
       if (noResultsMessage) {
@@ -221,7 +206,8 @@ const pageTitle = `分類：${category}`;
       });
     });
 
-    // 頁面載入時，根據已選中的分類（例如 "日本留學"）先跑一次篩選
+    // 頁面載入時，根據已選中的分類先跑一次篩選
     filterArticles();
   });
 </script>
+</BaseLayout>
