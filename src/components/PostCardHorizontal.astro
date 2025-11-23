@@ -1,6 +1,6 @@
 ---
 // src/components/PostCardHorizontal.astro
-// 這是首頁「最新文章」專用的橫式卡片
+// 這是首頁「最新文章」專用的橫式卡片 (已修正Tag佈局與尺寸)
 import type { CollectionEntry } from 'astro:content';
 
 interface Props {
@@ -13,6 +13,9 @@ const formatDate = (date: Date) => {
   const d = new Date(date);
   return `${d.getFullYear()}/${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')}`;
 };
+
+// 決定 Tags 顯示數量 (手機只顯示 2 個，電腦顯示 5 個)
+const visibleTagCount = 5; // 電腦版顯示數量
 ---
 
 <article class="bg-[var(--bg-card)] rounded-xl shadow-md flex items-center p-4 hover:shadow-lg transition-all duration-300 group">
@@ -31,10 +34,16 @@ const formatDate = (date: Date) => {
   <!-- 2. 右側內容 -->
   <div class="flex-1 flex flex-col min-w-0">
     
-    <!-- 分類 -->
+    <!-- 
+       ★ 修正 3：分類尺寸 (手機版更小)
+       將 text-xs 改為 xs:text-xs，並加入 text-[10px] 鎖定手機的尺寸
+    -->
     <div class="mb-2 flex flex-wrap gap-1 justify-end">
       {post.data.category.map(cat => (
-        <a href={`/category/${cat}`} class="text-xs font-medium text-white bg-[var(--accent-color)] py-1 px-2 rounded-full hover:bg-[var(--accent-hover)] transition-colors">
+        <a 
+          href={`/category/${cat}`} 
+          class="text-[10px] xs:text-xs font-medium text-white bg-[var(--accent-color)] py-0.5 px-1.5 rounded-full hover:bg-[var(--accent-hover)] transition-colors"
+        >
           {cat}
         </a>
       ))}
@@ -51,32 +60,44 @@ const formatDate = (date: Date) => {
     </div>
 
     <!-- 
-       ★ 底部資訊區 (日期 + Tags + 閱讀按鈕)
+       ★ 底部資訊區 (Tags + 日期)
     -->
-    <div class="flex items-center justify-between text-xs text-gray-500 gap-3 h-6 overflow-hidden">
+    <div class="flex items-center justify-between text-xs text-gray-500 gap-3">
       
-<!-- 左邊群組：日期 + Tags (強制單行截斷) -->
-      <!-- 整個容器設為 flex-1 和 overflow-hidden，確保它不會佔用「閱讀更多」的空間 -->
-      <div class="flex items-center gap-2 flex-1 min-w-0 overflow-hidden">
-        
-        <!-- 日期 (不准縮小) -->
-        <span class="flex-shrink-0 whitespace-nowrap">{formatDate(post.data.publishDate)}</span>
+      <!-- 
+         ★ 修正 2：將 Tags 提到最前面 
+         Tags 容器 (手機顯示 2 個，電腦顯示 5 個)
+      -->
+      <div class="flex items-center gap-1 flex-1 min-w-0 overflow-hidden">
         
         <!-- 
-           ★ 關鍵修改：
-           使用 flex-nowrap 確保 Tag 不會換行。
-           使用 truncate class，讓 Tag 區域整體超出時，從右邊切掉。
+           使用 slice() 實現寫死數量，確保手機版絕對不破版 
+           手機只顯示前 2 個，電腦顯示到 5 個 (避免 Tag 太多)
         -->
-        <div class="flex flex-nowrap gap-x-2 overflow-hidden items-center truncate">
-          {post.data.tags?.map(tag => (
-            <a 
-              href={`/archive?q=${encodeURIComponent(tag)}`}
-              class="text-xs text-gray-500 hover:text-[var(--accent-color)] hover:underline transition-colors cursor-pointer whitespace-nowrap flex-shrink-0"
-            >
-              #{tag}
-            </a>
-          ))}
-        </div>
+        {post.data.tags?.slice(0, 2).map(tag => (
+          <a 
+            href={`/archive?q=${encodeURIComponent(tag)}`}
+            class="px-1.5 text-xs text-gray-500 hover:text-[var(--accent-color)] hover:underline transition-colors cursor-pointer whitespace-nowrap flex-shrink-0 hidden xs:inline-block"
+          >
+            #{tag}
+          </a>
+        ))}
+        {post.data.tags?.slice(2, visibleTagCount).map(tag => (
+          <a 
+            href={`/archive?q=${encodeURIComponent(tag)}`}
+            class="px-1.5 text-xs text-gray-500 hover:text-[var(--accent-color)] hover:underline transition-colors cursor-pointer whitespace-nowrap flex-shrink-0 hidden sm:inline-block"
+          >
+            #{tag}
+          </a>
+        ))}
+        
+        <!-- 
+           ★ 修正 2：日期移動到 Tags 後方 
+           加上 ml-auto md:ml-2，讓日期在手機上和 Tags 隔開
+        -->
+        <span class="flex-shrink-0 whitespace-nowrap ml-auto md:ml-2 text-gray-400">
+            {formatDate(post.data.publishDate)}
+        </span>
       </div>
 
       <!-- 右邊按鈕：閱讀更多 (靠右) -->
