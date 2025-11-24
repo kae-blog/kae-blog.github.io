@@ -269,7 +269,7 @@ const { articleSlug, apiUrl, manualComment } = Astro.props;
             if(btnPublic) btnPublic.click(); // 觸發一次點擊事件來復原樣式
 
             if (statusMsg) {
-              statusMsg.textContent = '✓ 留言已送出！等待更新中...';
+              statusMsg.textContent = '✓ 已送出！';
               statusMsg.className = 'ml-4 font-semibold text-[#698a6a]';
               statusMsg.style.display = 'inline';
             }
