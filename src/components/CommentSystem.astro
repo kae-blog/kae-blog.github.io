@@ -1,5 +1,5 @@
 ---
-// 檔案路徑: src/components/CommentSystem.astro
+// 檔案路徑: src/components/CommentSystem.astro (已加入藥丸型切換器與 UI 連動)
 interface Props {
   articleSlug: string;
   apiUrl: string;
@@ -8,8 +8,8 @@ interface Props {
     name: string;
     date: string;
     content: string;
-    avatarChar?: string; // 舊的 (備用)
-    avatarSrc?: string;  // 👈 新增：圖片路徑
+    avatarChar?: string; 
+    avatarSrc?: string;
   };
 }
 
@@ -24,28 +24,66 @@ const { articleSlug, apiUrl, manualComment } = Astro.props;
 >
   <h3 class="text-2xl font-bold text-[var(--text-primary)] mb-6">訪客留言</h3>
   
-  <form id="comment-form" class="space-y-4 mb-10">
-    <div>
-      <label for="comment-name" class="block text-sm font-semibold text-[var(--text-secondary)] mb-2">您的名稱 (必填)</label>
-      <input type="text" id="comment-name" name="name" required class="w-full px-3 py-2 rounded-md border border-[var(--border-color)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--accent-color)]" />
-    </div>
-    <div>
-      <label for="comment-email" class="block text-sm font-semibold text-[var(--text-secondary)] mb-2">您的 Email (選填，不會公開)</label>
-      <input type="email" id="comment-email" name="email" class="w-full px-3 py-2 rounded-md border border-[var(--border-color)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--accent-color)]" />
-    </div>
-    <div>
-      <label for="comment-content" class="block text-sm font-semibold text-[var(--text-secondary)] mb-2">您的留言 (必填)</label>
-      <textarea id="comment-content" name="content" rows="4" required class="w-full px-3 py-2 rounded-md border border-[var(--border-color)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--accent-color)]"></textarea>
-    </div>
+  <!-- 1. 留言表單 -->
+  <form id="comment-form" class="space-y-6 mb-10">
     
-    <div class="flex items-center">
-      <input type="checkbox" id="comment-showOnSite" name="showOnSite" checked class="h-4 w-4 text-[var(--accent-color)] border-[var(--border-color)] rounded focus:ring-[var(--accent-color)]" />
-      <label for="comment-showOnSite" class="ml-2 block text-sm text-[var(--text-secondary)]">我同意將此留言（名稱與內容）公開顯示</label>
+    <!-- 第一排：名稱與 Email -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div>
+        <label for="comment-name" class="block text-sm font-semibold text-[var(--text-secondary)] mb-2">您的名稱 (必填)</label>
+        <input type="text" id="comment-name" name="name" required class="w-full px-4 py-2 rounded-lg border border-[var(--border-color)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--accent-color)] transition-shadow" />
+      </div>
+      <div>
+        <label for="comment-email" class="block text-sm font-semibold text-[var(--text-secondary)] mb-2">您的 Email (選填，不會公開)</label>
+        <input type="email" id="comment-email" name="email" class="w-full px-4 py-2 rounded-lg border border-[var(--border-color)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--accent-color)] transition-shadow" />
+      </div>
     </div>
 
+    <!-- 
+      ★ 修改重點 1：隱私模式切換器 (藥丸型 Segmented Control) 
+    -->
+    <div>
+      <div class="flex items-center justify-between mb-2">
+        <label class="block text-sm font-semibold text-[var(--text-secondary)]">留言設定</label>
+      </div>
+      
+      <!-- 隱藏原本的 Checkbox (邏輯仍依賴它，但使用者看不到) -->
+      <input type="checkbox" id="comment-showOnSite" name="showOnSite" checked class="hidden" />
+
+      <!-- 自訂 UI 切換器容器 -->
+      <div class="bg-gray-100 p-1 rounded-full flex text-sm font-medium cursor-pointer select-none max-w-md">
+        <!-- 左：公開按鈕 (預設激活) -->
+        <div id="btn-mode-public" class="flex-1 py-2 px-4 rounded-full text-center transition-all duration-300 bg-[var(--accent-color)] text-white shadow-sm">
+          公開留言
+        </div>
+        <!-- 右：私密按鈕 -->
+        <div id="btn-mode-private" class="flex-1 py-2 px-4 rounded-full text-center text-gray-500 transition-all duration-300 hover:text-[var(--text-primary)]">
+          僅版主可見
+        </div>
+      </div>
+    </div>
+
+    <!-- 留言內容區 -->
+    <div>
+      <label for="comment-content" class="block text-sm font-semibold text-[var(--text-secondary)] mb-2">您的留言 (必填)</label>
+      <!-- 
+         textarea 加上了 transition-colors 讓背景色切換更柔和 
+         id="comment-content" 是 JS 控制背景色的目標
+      -->
+      <textarea 
+        id="comment-content" 
+        name="content" 
+        rows="4" 
+        required 
+        placeholder="寫下你的想法..."
+        class="w-full px-4 py-3 rounded-lg border border-[var(--border-color)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--accent-color)] transition-colors duration-300"
+      ></textarea>
+    </div>
+    
+    <!-- 送出按鈕 -->
     <div class="pt-2">
-      <button type="submit" id="comment-submit-btn" class="px-5 py-2 bg-[var(--accent-color)] text-white text-base font-medium rounded-md hover:bg-[var(--accent-hover)] transition disabled:opacity-50 disabled:cursor-not-allowed">
-        送出留言
+      <button type="submit" id="comment-submit-btn" class="px-6 py-2.5 bg-[var(--accent-color)] text-white text-base font-medium rounded-lg hover:bg-[var(--accent-hover)] transition disabled:opacity-50 disabled:cursor-not-allowed shadow-sm">
+        發佈留言
       </button>
       <span id="comment-status-msg" class="hidden ml-4 font-semibold"></span>
     </div>
@@ -53,21 +91,22 @@ const { articleSlug, apiUrl, manualComment } = Astro.props;
 
   <div class="space-y-6 border-t border-[var(--border-color)] pt-10">
     
+    <!-- (靜態) 手動置頂留言 -->
     {manualComment && (
       <div class="flex space-x-4">
-<div class="flex-shrink-0">
-  {manualComment.avatarSrc ? (
-    <img 
-      src={manualComment.avatarSrc} 
-      alt={manualComment.name} 
-      class="w-10 h-10 rounded-full object-cover border border-[var(--border-color)]" 
-    />
-  ) : (
-    <div class="w-10 h-10 rounded-full bg-[var(--accent-color)] flex items-center justify-center text-white font-semibold text-lg">
-      {manualComment.avatarChar || 'K'}
-    </div>
-  )}
-</div>
+        <div class="flex-shrink-0">
+          {manualComment.avatarSrc ? (
+            <img 
+              src={manualComment.avatarSrc} 
+              alt={manualComment.name} 
+              class="w-10 h-10 rounded-full object-cover border border-[var(--border-color)]" 
+            />
+          ) : (
+            <div class="w-10 h-10 rounded-full bg-[var(--accent-color)] flex items-center justify-center text-white font-semibold text-lg">
+              {manualComment.avatarChar || 'K'}
+            </div>
+          )}
+        </div>
         <div class="flex-1">
           <div class="flex items-baseline space-x-2">
             <span class="font-bold text-[var(--text-primary)]">{manualComment.name}</span>
@@ -78,6 +117,7 @@ const { articleSlug, apiUrl, manualComment } = Astro.props;
       </div>
     )}
 
+    <!-- (動態) 訪客留言列表容器 -->
     <div id="dynamic-comments-container" class="space-y-6">
       <p class="text-center text-[var(--text-secondary)]">留言載入中...</p>
     </div>
@@ -86,7 +126,6 @@ const { articleSlug, apiUrl, manualComment } = Astro.props;
 </div>
 
 <script>
-  // 定義初始化函式
   function initCommentSystem() {
     const root = document.getElementById('comment-system-root');
     if (!root) return;
@@ -98,35 +137,80 @@ const { articleSlug, apiUrl, manualComment } = Astro.props;
     const statusMsg = document.getElementById('comment-status-msg');
     const listContainer = document.getElementById('dynamic-comments-container');
 
+    // ★ UI 元件選取
+    const checkboxShow = document.getElementById('comment-showOnSite') as HTMLInputElement;
+    const btnPublic = document.getElementById('btn-mode-public');
+    const btnPrivate = document.getElementById('btn-mode-private');
+    const contentTextarea = document.getElementById('comment-content') as HTMLTextAreaElement;
+
     if (!API_URL || !SLUG || !form || !listContainer) return;
+
+    // ==========================================
+    // ★ 功能 X: 切換器邏輯 (UI 連動)
+    // ==========================================
+    if (btnPublic && btnPrivate && checkboxShow && contentTextarea) {
+        
+        // 定義樣式變數
+        const activeClass = ['bg-[var(--accent-color)]', 'text-white', 'shadow-sm'];
+        const inactiveClass = ['text-gray-500', 'hover:text-[var(--text-primary)]'];
+
+        // 切換到「公開模式」
+        btnPublic.addEventListener('click', () => {
+            // 1. 更新 Checkbox
+            checkboxShow.checked = true;
+            
+            // 2. 更新按鈕樣式
+            btnPublic.classList.add(...activeClass);
+            btnPublic.classList.remove(...inactiveClass);
+            btnPrivate.classList.remove(...activeClass);
+            btnPrivate.classList.add(...inactiveClass);
+            
+            // 3. 更新輸入框提示與背景
+            contentTextarea.placeholder = "寫下你的想法...";
+            contentTextarea.style.backgroundColor = "#ffffff"; // 白底
+            
+            // 4. 更新送出按鈕文字
+            submitBtn.textContent = "發佈留言";
+        });
+
+        // 切換到「私密模式」
+        btnPrivate.addEventListener('click', () => {
+            // 1. 更新 Checkbox
+            checkboxShow.checked = false;
+            
+            // 2. 更新按鈕樣式
+            btnPrivate.classList.add(...activeClass);
+            btnPrivate.classList.remove(...inactiveClass);
+            btnPublic.classList.remove(...activeClass);
+            btnPublic.classList.add(...inactiveClass);
+            
+            // 3. 更新輸入框提示與背景 (極淡灰)
+            contentTextarea.placeholder = "這則內容將被隱藏，只有版主能閱讀。";
+            contentTextarea.style.backgroundColor = "#f9f9f9"; 
+            
+            // 4. 更新送出按鈕文字
+            submitBtn.textContent = "送出悄悄話";
+        });
+    }
 
     // --- 功能 A: 抓取留言 (清空重繪策略) ---
     async function fetchComments() {
-      // 1. 設定載入狀態 (不影響置頂留言)
       listContainer.innerHTML = '<p class="text-center text-[var(--text-secondary)]">留言載入中...</p>';
-
       try {
         const res = await fetch(`${API_URL}?slug=${SLUG}`);
         const json = await res.json();
-
         if (json.result === 'success' && json.data) {
-          // 2. 清空容器 (徹底避免重複)
           listContainer.innerHTML = '';
-
           if (json.data.length === 0) {
-             // 如果沒有動態留言，顯示提示 (這裡不影響置頂留言)
-             // 若有置頂留言，這裡留白也可以，或者顯示「尚無訪客留言」
-             // 這裡我們選擇若無訪客留言則不顯示任何訊息，保持版面乾淨
+             // 無留言時留白
           } else {
-            // 3. 重繪所有留言
             json.data.forEach((comment: any) => {
               const dateStr = new Date(comment.timestamp).toLocaleString('zh-TW', {
                   year: 'numeric', month: '2-digit', day: '2-digit',
                   hour: 'numeric', minute: '2-digit', hour12: true
               });
-              
               const div = document.createElement('div');
-              div.className = 'flex space-x-4 animate-fade-in'; // 可加個淡入動畫 class 若有設定
+              div.className = 'flex space-x-4 animate-fade-in';
               div.innerHTML = `
                 <div class="flex-shrink-0">
                   <div class="w-10 h-10 rounded-full bg-[var(--accent-color)] flex items-center justify-center text-white font-semibold text-lg">
@@ -155,9 +239,8 @@ const { articleSlug, apiUrl, manualComment } = Astro.props;
     if (form.dataset.bound !== 'true') {
       form.addEventListener('submit', async (e) => {
         e.preventDefault();
-        
-        // 1. 鎖定按鈕
         submitBtn.disabled = true;
+        const originalBtnText = submitBtn.textContent; // 暫存原本的文字 (發佈留言/送出悄悄話)
         submitBtn.textContent = '處理中...';
         if (statusMsg) statusMsg.style.display = 'none';
 
@@ -179,38 +262,37 @@ const { articleSlug, apiUrl, manualComment } = Astro.props;
           const json = await res.json();
 
           if (json.result === 'success') {
-            // 2. 成功狀態
             form.reset();
+            
+            // 重置 UI 到「公開模式」狀態 (預設)
+            if(checkboxShow) checkboxShow.checked = true;
+            if(btnPublic) btnPublic.click(); // 觸發一次點擊事件來復原樣式
+
             if (statusMsg) {
               statusMsg.textContent = '✓ 留言已送出！等待更新中...';
               statusMsg.className = 'ml-4 font-semibold text-[#698a6a]';
               statusMsg.style.display = 'inline';
             }
-            // 延遲重新抓取 (避免 Google Sheet 寫入延遲)
             setTimeout(fetchComments, 1500);
           } else {
             throw new Error(json.message);
           }
         } catch (err) {
-          // 3. 失敗狀態
           if (statusMsg) {
             statusMsg.textContent = '✗ 送出失敗，請稍後再試。';
             statusMsg.className = 'ml-4 font-semibold text-red-600';
             statusMsg.style.display = 'inline';
           }
         } finally {
-          // 4. 解鎖按鈕 (無論成功失敗)
           submitBtn.disabled = false;
-          submitBtn.textContent = '送出留言';
+          submitBtn.textContent = "發佈留言"; // 提交後恢復預設文字
         }
       });
       form.dataset.bound = 'true';
     }
 
-    // 頁面載入時執行抓取
     fetchComments();
   }
 
-  // 綁定 Astro 頁面切換事件
   document.addEventListener('astro:page-load', initCommentSystem);
 </script>
