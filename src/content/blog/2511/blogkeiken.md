@@ -31,6 +31,7 @@ heroImage: '/images/2511/blog_keiken_hero.png'
 tags: ['自架站', '部落格', 'GitHub Pages', 'Astro', '前端開發', '網站架設', 'SEO', 'AI 寫網頁', '個人品牌', '技術分享', 'AI工具']
 # (8) 自訂網址名稱
 slug: blogkeiken
+draft: true
 ---
 
 ![本文封面](/images/2511/blog_keiken_hero.png)
